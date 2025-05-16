@@ -47,7 +47,7 @@ def load_and_convert(file_path, output_path):
 italy_parquet_path = processed_dir / "italy_2021_2024_clean.parquet"
 load_and_convert(italy_clean_path, italy_parquet_path)
 
-# ---- SConvertiamo VEZIA ---- #
+# ---- Convertiamo SVEZIA ---- #
 sweden_parquet_path = processed_dir / "sweden_2021_2024_clean.parquet"
 load_and_convert(sweden_clean_path, sweden_parquet_path)
 
