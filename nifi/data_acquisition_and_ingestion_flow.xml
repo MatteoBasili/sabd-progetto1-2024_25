@@ -2248,7 +2248,7 @@
                 <properties>
                     <entry>
                         <key>Input Directory</key>
-                        <value>/home/matteo/Scrivania/SABD/Progetto 1/sabd-progetto1-2024_25/data/raw</value>
+                        <value>/opt/nifi/input_data_files</value>
                     </entry>
                     <entry>
                         <key>File Filter</key>

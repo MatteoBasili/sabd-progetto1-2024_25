@@ -1,0 +1,103 @@
+version: '3'
+
+services:
+  namenode:
+    image: apache/hadoop:3.3.6
+    container_name: namenode
+    hostname: namenode
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - ./hdfs/hadoop_namenode:/opt/hadoop/data/nameNode
+      - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
+      - ./hdfs/start-hdfs.sh:/start-hdfs.sh
+    ports:
+      - "9870:9870"
+    command: [ "/bin/bash", "/start-hdfs.sh" ]
+    networks:
+      hdfs_network:
+        ipv4_address: 172.30.0.2
+
+  datanode1:
+    image: apache/hadoop:3.3.6
+    container_name: datanode1
+    hostname: datanode1
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - ./hdfs/hadoop_datanode1:/opt/hadoop/data/dataNode
+      - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
+      - ./hdfs/init-datanode.sh:/init-datanode.sh
+    depends_on:
+      - namenode
+    command: [ "/bin/bash", "/init-datanode.sh" ]
+    networks:
+      hdfs_network:
+        ipv4_address: 172.30.0.3
+
+  datanode2:
+    image: apache/hadoop:3.3.6
+    container_name: datanode2
+    hostname: datanode2
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - ./hdfs/hadoop_datanode2:/opt/hadoop/data/dataNode
+      - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
+      - ./hdfs/init-datanode.sh:/init-datanode.sh
+    depends_on:
+      - namenode
+    command: [ "/bin/bash", "/init-datanode.sh" ]
+    networks:
+      hdfs_network:
+        ipv4_address: 172.30.0.4
+        
+  datanode3:
+    image: apache/hadoop:3.3.6
+    container_name: datanode3
+    hostname: datanode3
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - ./hdfs/hadoop_datanode3:/opt/hadoop/data/dataNode
+      - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
+      - ./hdfs/init-datanode.sh:/init-datanode.sh
+    depends_on:
+      - namenode
+    command: [ "/bin/bash", "/init-datanode.sh" ]
+    networks:
+      hdfs_network:
+        ipv4_address: 172.30.0.5
+        
+  nifi:
+    image: apache/nifi:1.24.0
+    container_name: nifi
+    hostname: nifi
+    ports:
+      - "8080:8080"
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080
+      - NIFI_REMOTE_INPUT_SECURE=false
+      - NIFI.HADOOP.CONFIGURATION.RESOURCES=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
+      #NIFI_JVM_OPTS: -Dnifi.hadoop.configuration.resources=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
+    volumes:
+     - ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
+     - ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
+     - ./data/raw:/opt/nifi/input_data_files
+     - ./nifi/data_acquisition_and_ingestion_flow.xml:/opt/nifi/nifi-current/conf/templates/data_acquisition_and_ingestion_flow.xml
+    depends_on:
+      - namenode
+    networks:
+      hdfs_network:
+        ipv4_address: 172.30.0.10
+
+networks:
+  hdfs_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/16
