@@ -16,8 +16,7 @@ services:
       - "9870:9870"
     command: [ "/bin/bash", "/start-hdfs.sh" ]
     networks:
-      hdfs_network:
-        ipv4_address: 172.30.0.2
+      - sabd_network
 
   datanode1:
     image: apache/hadoop:3.3.6
@@ -30,12 +29,13 @@ services:
       - ./hdfs/hadoop_datanode1:/opt/hadoop/data/dataNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/init-datanode.sh:/init-datanode.sh
+    ports:
+      - "9864:9864"
     depends_on:
       - namenode
     command: [ "/bin/bash", "/init-datanode.sh" ]
     networks:
-      hdfs_network:
-        ipv4_address: 172.30.0.3
+      - sabd_network
 
   datanode2:
     image: apache/hadoop:3.3.6
@@ -48,12 +48,13 @@ services:
       - ./hdfs/hadoop_datanode2:/opt/hadoop/data/dataNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/init-datanode.sh:/init-datanode.sh
+    ports:
+      - "9865:9864"
     depends_on:
       - namenode
     command: [ "/bin/bash", "/init-datanode.sh" ]
     networks:
-      hdfs_network:
-        ipv4_address: 172.30.0.4
+      - sabd_network
         
   datanode3:
     image: apache/hadoop:3.3.6
@@ -66,12 +67,13 @@ services:
       - ./hdfs/hadoop_datanode3:/opt/hadoop/data/dataNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/init-datanode.sh:/init-datanode.sh
+    ports:
+      - "9866:9864"
     depends_on:
       - namenode
     command: [ "/bin/bash", "/init-datanode.sh" ]
     networks:
-      hdfs_network:
-        ipv4_address: 172.30.0.5
+      - sabd_network
         
   nifi:
     image: apache/nifi:1.24.0
@@ -82,8 +84,7 @@ services:
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_REMOTE_INPUT_SECURE=false
-      - NIFI.HADOOP.CONFIGURATION.RESOURCES=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
-      #NIFI_JVM_OPTS: -Dnifi.hadoop.configuration.resources=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
+      - NIFI_HADOOP_CONFIGURATION_RESOURCES=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
     volumes:
      - ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
      - ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
@@ -92,12 +93,8 @@ services:
     depends_on:
       - namenode
     networks:
-      hdfs_network:
-        ipv4_address: 172.30.0.10
+      - sabd_network
 
 networks:
-  hdfs_network:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.30.0.0/16
+  sabd_network:
+    driver: bridge
