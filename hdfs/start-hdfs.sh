@@ -12,6 +12,10 @@ if [ ! -d "/opt/hadoop/data/nameNode/current" ]; then
     echo "Creating HDFS directory /data/electricity..."
     hdfs dfs -mkdir -p /data/electricity
     hdfs dfs -chmod -R 777 /data/electricity
+    
+    echo "Creating HDFS directory /output..."
+    hdfs dfs -mkdir -p /output
+    hdfs dfs -chmod -R 777 /output
 
     # Termina il NameNode temporaneo
     hdfs --daemon stop namenode

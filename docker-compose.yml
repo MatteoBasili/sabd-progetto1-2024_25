@@ -9,9 +9,9 @@ services:
     environment:
       - HADOOP_HOME=/opt/hadoop
     volumes:
-      - ./hdfs/hadoop_namenode:/opt/hadoop/data/nameNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/start-hdfs.sh:/start-hdfs.sh
+      - ./hdfs/shared_data:/shared_data
     ports:
       - "9870:9870"
     command: [ "/bin/bash", "/start-hdfs.sh" ]
@@ -26,7 +26,6 @@ services:
     environment:
       - HADOOP_HOME=/opt/hadoop
     volumes:
-      - ./hdfs/hadoop_datanode1:/opt/hadoop/data/dataNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/init-datanode.sh:/init-datanode.sh
     ports:
@@ -45,7 +44,6 @@ services:
     #environment:
      # - HADOOP_HOME=/opt/hadoop
     #volumes:
-     # - ./hdfs/hadoop_datanode2:/opt/hadoop/data/dataNode
       #- ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
      # - ./hdfs/init-datanode.sh:/init-datanode.sh
     #ports:
@@ -64,7 +62,6 @@ services:
     #environment:
      # - HADOOP_HOME=/opt/hadoop
     #volumes:
-     # - ./hdfs/hadoop_datanode3:/opt/hadoop/data/dataNode
       #- ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       #- ./hdfs/init-datanode.sh:/init-datanode.sh
     #ports:
@@ -95,15 +92,15 @@ services:
     networks:
       - sabd_network
       
-  spark:
+  spark-master:
     image: bitnami/spark:3.5.1
-    container_name: spark
-    hostname: spark
-    user: root
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - "7077:7077"    # Spark master port
+      - "4040:4040"    # Spark UI
     environment:
-      - SPARK_MODE=client
-      - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
+      - SPARK_MODE=master
     volumes:
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./spark/scripts:/opt/spark/work-dir
@@ -111,9 +108,49 @@ services:
       - namenode
       #- datanode1
       #- datanode2
-    command: ["tail", "-f", "/dev/null"]
     networks:
       - sabd_network
+      
+  spark-worker-1:
+    image: bitnami/spark:3.5.1
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - sabd_network
+
+  spark-worker-2:
+    image: bitnami/spark:3.5.1
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - sabd_network
+      
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: grafana
+    hostname: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_INSTALL_PLUGINS=marcusolsson-csv-datasource
+      - GF_PLUGIN_ALLOW_LOCAL_MODE=true
+    volumes:
+      - ./hdfs/shared_data:/var/lib/grafana/csv
+    depends_on:
+      - namenode
+    networks:
+      - sabd_network
+
 
 networks:
   sabd_network:
