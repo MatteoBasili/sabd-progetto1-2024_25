@@ -82,6 +82,9 @@ services:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_REMOTE_INPUT_SECURE=false
       - NIFI_HADOOP_CONFIGURATION_RESOURCES=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
+      - NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_USAGE_PERCENTAGE=80
+      - NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_SIZE=20 GB
+      - NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_RETENTION_PERIOD=24 hours
     volumes:
      - ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
      - ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
