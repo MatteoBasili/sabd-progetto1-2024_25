@@ -9,6 +9,7 @@ services:
     environment:
       - HADOOP_HOME=/opt/hadoop
     volumes:
+      - namenode_data:/opt/hadoop/data/nameNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/start-hdfs.sh:/start-hdfs.sh
       - ./hdfs/shared_data:/shared_data
@@ -26,6 +27,7 @@ services:
     environment:
       - HADOOP_HOME=/opt/hadoop
     volumes:
+      - datanode1_data:/opt/hadoop/data/dataNode
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./hdfs/init-datanode.sh:/init-datanode.sh
     ports:
@@ -36,23 +38,24 @@ services:
     networks:
       - sabd_network
 
-  #datanode2:
-    #image: apache/hadoop:3.3.6
-    #container_name: datanode2
-    #hostname: datanode2
-    #user: root
-    #environment:
-     # - HADOOP_HOME=/opt/hadoop
-    #volumes:
-      #- ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
-     # - ./hdfs/init-datanode.sh:/init-datanode.sh
-    #ports:
-     # - "9865:9864"
-    #depends_on:
-     # - namenode
-    #command: [ "/bin/bash", "/init-datanode.sh" ]
-    #networks:
-      #- sabd_network
+  datanode2:
+    image: apache/hadoop:3.3.6
+    container_name: datanode2
+    hostname: datanode2
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - datanode2_data:/opt/hadoop/data/dataNode
+      - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
+      - ./hdfs/init-datanode.sh:/init-datanode.sh
+    ports:
+      - "9865:9864"
+    depends_on:
+      - namenode
+    command: [ "/bin/bash", "/init-datanode.sh" ]
+    networks:
+      - sabd_network
         
   #datanode3:
    # image: apache/hadoop:3.3.6
@@ -62,6 +65,7 @@ services:
     #environment:
      # - HADOOP_HOME=/opt/hadoop
     #volumes:
+      #- datanode3_data:/opt/hadoop/data/dataNode
       #- ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       #- ./hdfs/init-datanode.sh:/init-datanode.sh
     #ports:
@@ -96,7 +100,9 @@ services:
       - sabd_network
       
   spark-master:
-    image: bitnami/spark:3.5.1
+    #image: bitnami/spark:3.5.1
+    build:
+      context: ./spark/docker
     container_name: spark-master
     hostname: spark-master
     ports:
@@ -107,10 +113,12 @@ services:
     volumes:
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./spark/scripts:/opt/spark/work-dir
+      - ./spark/export:/opt/spark/export
     depends_on:
       - namenode
-      #- datanode1
-      #- datanode2
+      - datanode1
+      - datanode2
+      #- datanode3
     networks:
       - sabd_network
       
@@ -138,23 +146,39 @@ services:
     networks:
       - sabd_network
       
-  grafana:
-    image: grafana/grafana:10.3.1
-    container_name: grafana
-    hostname: grafana
+  #grafana:
+   # image: grafana/grafana:10.3.1
+    #container_name: grafana
+    #hostname: grafana
+    #ports:
+     # - "3000:3000"
+    #environment:
+     # - GF_INSTALL_PLUGINS=marcusolsson-csv-datasource
+      #- GF_PLUGIN_ALLOW_LOCAL_MODE=true
+    #volumes:
+     # - ./hdfs/shared_data:/var/lib/grafana/csv
+    #depends_on:
+     # - namenode
+    #networks:
+     # - sabd_network
+      
+  redis:
+    image: redis:7.2
+    container_name: redis
+    hostname: redis
     ports:
-      - "3000:3000"
-    environment:
-      - GF_INSTALL_PLUGINS=marcusolsson-csv-datasource
-      - GF_PLUGIN_ALLOW_LOCAL_MODE=true
-    volumes:
-      - ./hdfs/shared_data:/var/lib/grafana/csv
+      - "6379:6379"
     depends_on:
       - namenode
     networks:
       - sabd_network
 
-
 networks:
   sabd_network:
     driver: bridge
+    
+volumes:
+  namenode_data:
+  datanode1_data:
+  datanode2_data:
+

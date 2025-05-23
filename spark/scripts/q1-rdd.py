@@ -1,5 +1,6 @@
 from pyspark import SparkConf, SparkContext
 from datetime import datetime
+import subprocess
 
 def parse_line(line):
     try:
@@ -56,7 +57,15 @@ if __name__ == "__main__":
     output = results.map(lambda x: f"{x[0]},{x[1]},{x[2]},{x[3]},{x[4]},{x[5]},{x[6]},{x[7]}")
     header = sc.parallelize(["date,country,carbon-mean,carbon-min,carbon-max,cfe-mean,cfe-min,cfe-max"])
     full_output = header.union(output)
-    full_output.saveAsTextFile(f"hdfs://namenode:9000/output/q1_rdd_{datetime.now().strftime('%Y%m%d%H%M%S')}")
+    output_path = f"/output/q1_rdd_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    full_output.saveAsTextFile(f"hdfs://namenode:9000{output_path}")
 
     sc.stop()
+    
+    # Lancia lo script exporter e passagli il path
+    print("✅ Job Spark completato. Avvio export su Redis...")
+
+    subprocess.run(["python", "/opt/spark/export/export_hdfs_to_redis.py", output_path], check=True)
+
+    print("✅ Export completato.")
 
