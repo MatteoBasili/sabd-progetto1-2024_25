@@ -76,31 +76,30 @@ services:
     #networks:
      # - sabd_network
         
-  nifi:
-    image: apache/nifi:1.24.0
-    container_name: nifi
-    hostname: nifi
-    ports:
-      - "8080:8080"
-    environment:
-      - NIFI_WEB_HTTP_PORT=8080
-      - NIFI_REMOTE_INPUT_SECURE=false
-      - NIFI_HADOOP_CONFIGURATION_RESOURCES=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
-      - NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_USAGE_PERCENTAGE=80
-      - NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_SIZE=20 GB
-      - NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_RETENTION_PERIOD=24 hours
-    volumes:
-     - ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
-     - ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
-     - ./data/raw:/opt/nifi/input_data_files
-     - ./nifi/data_acquisition_and_ingestion_flow.xml:/opt/nifi/nifi-current/conf/templates/data_acquisition_and_ingestion_flow.xml
-    depends_on:
-      - namenode
-    networks:
-      - sabd_network
+  #nifi:
+   # image: apache/nifi:1.24.0
+    #container_name: nifi
+    #hostname: nifi
+    #ports:
+     # - "8080:8080"
+    #environment:
+     # - NIFI_WEB_HTTP_PORT=8080
+      #- NIFI_REMOTE_INPUT_SECURE=false
+      #- NIFI_HADOOP_CONFIGURATION_RESOURCES=/opt/nifi/nifi-current/conf/core-site.xml,/opt/nifi/nifi-current/conf/hdfs-site.xml
+      #- NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_USAGE_PERCENTAGE=80
+      #- NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_SIZE=20 GB
+      #- NIFI_CONTENT_REPOSITORY_ARCHIVED_MAX_RETENTION_PERIOD=24 hours
+    #volumes:
+     #- ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
+     #- ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
+     #- ./data/raw:/opt/nifi/input_data_files
+     #- ./nifi/data_acquisition_and_ingestion_flow.xml:/opt/nifi/nifi-current/conf/templates/data_acquisition_and_ingestion_flow.xml
+    #depends_on:
+     # - namenode
+    #networks:
+     # - sabd_network
       
   spark-master:
-    #image: bitnami/spark:3.5.1
     build:
       context: ./spark/docker
     container_name: spark-master
@@ -112,8 +111,8 @@ services:
       - SPARK_MODE=master
     volumes:
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
-      - ./spark/scripts:/opt/spark/work-dir
-      - ./spark/export:/opt/spark/export
+      - ./spark/scripts/queries:/opt/spark/work-dir
+      - ./spark/scripts/export:/opt/spark/export
     depends_on:
       - namenode
       - datanode1
@@ -146,21 +145,21 @@ services:
     networks:
       - sabd_network
       
-  #grafana:
-   # image: grafana/grafana:10.3.1
-    #container_name: grafana
-    #hostname: grafana
-    #ports:
-     # - "3000:3000"
-    #environment:
-     # - GF_INSTALL_PLUGINS=marcusolsson-csv-datasource
-      #- GF_PLUGIN_ALLOW_LOCAL_MODE=true
-    #volumes:
-     # - ./hdfs/shared_data:/var/lib/grafana/csv
-    #depends_on:
-     # - namenode
-    #networks:
-     # - sabd_network
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: grafana
+    hostname: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_INSTALL_PLUGINS=marcusolsson-csv-datasource
+      - GF_PLUGIN_ALLOW_LOCAL_MODE=true
+    volumes:
+      - ./hdfs/shared_data:/var/lib/grafana/csv
+    depends_on:
+      - namenode
+    networks:
+      - sabd_network
       
   redis:
     image: redis:7.2
