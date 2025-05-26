@@ -7,11 +7,7 @@ if [ ! -d "/opt/hadoop/data/nameNode/current" ]; then
     
     # Avvia temporaneamente il NameNode in background per poter creare le cartelle
     hdfs --daemon start namenode
-    sleep 5  # Attendi un po' per avvio
-
-    echo "Creating HDFS directory /data/electricity..."
-    hdfs dfs -mkdir -p /data/electricity
-    hdfs dfs -chmod -R 777 /data/electricity
+    sleep 10 #5  # Attendi un po' per avvio
     
     echo "Creating HDFS directory /output..."
     hdfs dfs -mkdir -p /output
