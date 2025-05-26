@@ -4,7 +4,7 @@ import redis
 import glob
 
 if len(sys.argv) != 2:
-    print("Usage: python export_hdfs_to_redis.py <hdfs_output_path>")
+    print("Usage: python export_q1_hdfs_to_redis.py <hdfs_output_path>")
     sys.exit(1)
 
 # Connessione a WebHDFS (porta 9870)
