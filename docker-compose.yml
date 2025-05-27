@@ -58,7 +58,7 @@ services:
       - sabd_network
         
   #datanode3:
-   # image: apache/hadoop:3.3.6
+    #image: apache/hadoop:3.3.6
     #container_name: datanode3
     #hostname: datanode3
     #user: root
@@ -126,6 +126,7 @@ services:
     image: bitnami/spark:3.5.1
     container_name: spark-worker-1
     hostname: spark-worker-1
+    user: root
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
@@ -138,6 +139,7 @@ services:
     image: bitnami/spark:3.5.1
     container_name: spark-worker-2
     hostname: spark-worker-2
+    user: root
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
@@ -150,6 +152,7 @@ services:
    # image: grafana/grafana:10.3.1
     #container_name: grafana
     #hostname: grafana
+    #user: root
     #ports:
      # - "3000:3000"
     #environment:
@@ -166,6 +169,7 @@ services:
     image: redis:7.2
     container_name: redis
     hostname: redis
+    user: root
     ports:
       - "6379:6379"
     depends_on:
