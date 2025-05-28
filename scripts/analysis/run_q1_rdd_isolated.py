@@ -4,13 +4,13 @@ import statistics
 
 NUM_RUNS = 10
 DOCKER_COMPOSE_PATH = "."  # Modifica se il docker-compose.yml non è in cwd
-OUTPUT_FILE = "./analyses/performance_q1_df_stats.txt"
+OUTPUT_FILE = "./Results/analysis/performance_q1_rdd_stats.txt"
 
 # Comando per lanciare il job Spark all'interno del container spark-master
 SPARK_SUBMIT_COMMAND = [
     "docker", "exec", "spark-master",
     "spark-submit",
-    "/opt/spark/work-dir/q1-df.py"
+    "/opt/spark/work-dir/q1-rdd.py"
 ]
 
 def stop_and_remove_spark_containers():
@@ -25,8 +25,8 @@ def start_spark_containers():
     print("Starting Spark containers...")
     subprocess.run(["docker-compose", "up", "-d", "spark-master", "spark-worker-1", "spark-worker-2"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    print("Waiting 20 seconds for Spark to initialize...")
-    time.sleep(20)  # Attendere che Spark sia pronto
+    print("Waiting 15 seconds for Spark to initialize...")
+    time.sleep(15)  # Attendere che Spark sia pronto
 
 def run_spark_job():
     print("Running Spark job...")

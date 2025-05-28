@@ -10,35 +10,37 @@ def run_command(command, capture_output=False):
         sys.exit(result.returncode)
     return result.stdout if capture_output else None
 
+def get_last_output_path(prefix):
+    # Cerca l'ultimo path con un certo prefisso dentro /output
+    cmd = f"docker exec namenode hdfs dfs -ls /output | grep {prefix} | awk '{{print $8}}' | sort | tail -n 1"
+    output = run_command(cmd, capture_output=True)
+    path = output.strip()
+    if not path:
+        print(f"❌ Nessun path trovato in /output per {prefix}")
+        sys.exit(1)
+    return path
+
 def main():
     print("🚀 Avvio Spark job...")
     run_command("docker exec spark-master spark-submit /opt/spark/work-dir/q1-rdd.py")
 
     print("📦 Recupero ultimo path di output HDFS...")
-    hdfs_list_output = run_command(
-        "docker exec namenode hdfs dfs -ls /output | grep q1_rdd_ | awk '{print $8}' | sort | tail -n 1",
-        capture_output=True
-    )
+    last_path = get_last_output_path("q1_rdd_")
+    print(f"📁 Ultimo path di output trovato: {last_path}")
 
-    last_output_path = hdfs_list_output.strip()
-    if not last_output_path:
-        print("❌ Nessun path trovato in /output per q1_rdd_")
-        sys.exit(1)
-
-    print(f"📁 Ultimo path HDFS trovato: {last_output_path}")
-
-    print("📤 Esportazione su Redis in corso...")
-    run_command(f"docker exec spark-master python /opt/spark/export/export_q1_hdfs_to_redis.py \"{last_output_path}\"")
+    print("📤 Export su Redis dei risultati in corso...")
+    run_command(f"docker exec spark-master python /opt/spark/export/export_q1_hdfs_to_redis.py \"{last_path}\"")
     print("✅ Export su Redis completato.")
 
-    print("📝 Estrazione dei risultati da HDFS...")
+    print("📝 Estrazione file CSV da HDFS...")
     run_command(
-        f"docker exec namenode bash -c \"hdfs dfs -getmerge {last_output_path} /shared_data/q1_rdd_result.csv && "
-        f"echo '✅ File CSV pronto in /shared_data/q1_rdd_result.csv'\""
+        f"docker exec namenode bash -c \"hdfs dfs -getmerge {last_path} /results/q1_rdd_result.csv && "
+        f"echo '✅ File CSV pronto in /results/q1_rdd_result.csv'\""
     )
 
-    print("📁 File CSV disponibile nella directory montata: ./hdfs/shared_data/q1_rdd_result.csv")
-
+    print("📁 File CSV disponibile nella directory 'Results':")
+    print("  - Results/csv/q1_rdd_result.csv")
+    
 if __name__ == "__main__":
     main()
 

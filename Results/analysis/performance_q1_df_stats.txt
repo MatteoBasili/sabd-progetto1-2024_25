@@ -1,0 +1,5 @@
+=== PERFORMANCE STATISTICS ===
+Number of runs: 2
+Average execution time: 53.91 seconds
+Standard deviation: 32.24 seconds
+All run times: [76.71, 31.11]

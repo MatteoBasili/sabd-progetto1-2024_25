@@ -29,7 +29,7 @@ for part in part_files:
             if len(parts) < 4:
                 continue  # Salta righe incomplete
 
-            date = parts[0]        # es: 2022_3
+            date = parts[0]        # es: 2022-3
             carbon = parts[1]      # media carbon intensity
             cfe = parts[2]         # media CFE
             order_type = parts[3]  # es: carbon_desc
