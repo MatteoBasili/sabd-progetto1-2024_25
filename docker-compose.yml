@@ -150,7 +150,7 @@ services:
       - sabd_network
       
   grafana:
-    image: grafana/grafana:10.3.1
+    image: grafana/grafana:12.0.1
     container_name: grafana
     hostname: grafana
     user: root
@@ -159,12 +159,29 @@ services:
     environment:
       - GF_INSTALL_PLUGINS=marcusolsson-csv-datasource
       - GF_PLUGIN_ALLOW_LOCAL_MODE=true
+      - GF_RENDERING_SERVER_URL=http://grafana-image-renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
+      - GF_LOG_FILTERS=rendering:debug
     volumes:
       - ./Results/csv:/var/lib/grafana/csv
     depends_on:
       - namenode
+      - grafana-image-renderer
     networks:
       - sabd_network
+      
+  grafana-image-renderer:
+    image: grafana/grafana-image-renderer:3.12.0
+    container_name: grafana-image-renderer
+    hostname: grafana-image-renderer
+    user: root
+    ports:
+      - "8081:8081"
+    depends_on:
+      - namenode
+    networks:
+      - sabd_network
+    restart: unless-stopped
       
   redis:
     image: redis:7.2

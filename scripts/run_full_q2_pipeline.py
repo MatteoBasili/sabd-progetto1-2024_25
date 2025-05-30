@@ -2,6 +2,9 @@ import subprocess
 import sys
 import time
 
+CSV_ALL_RESULT = "q2_all_result.csv"
+CSV_TOP5_RESULT = "q2_top_result.csv"
+
 def run_command(command, capture_output=False):
     print(f"⚙️  Eseguo: {command}")
     result = subprocess.run(command, shell=True, text=True, capture_output=capture_output)
@@ -21,36 +24,50 @@ def get_last_output_path(prefix):
     return path
 
 def main():
+    if len(sys.argv) != 2 or sys.argv[1] not in ["rdd", "df", "sql"]:
+        print("❗️Uso: python3 run_full_q2_pipeline.py [rdd|df|sql]")
+        sys.exit(1)
+
+    mode = sys.argv[1]
+    if mode == "sql":
+        work_dir = "/opt/spark/work-dir/sql/"
+    else:
+        work_dir = "/opt/spark/work-dir/"
+
     print("🚀 Avvio Spark job...")
-    run_command("docker exec spark-master spark-submit /opt/spark/work-dir/q2-df.py")
+    run_command(f"docker exec spark-master spark-submit {work_dir}q2-{mode}.py")
 
     print("📦 Recupero ultimo path di output mensile completo (per grafici)...")
-    monthly_all_path = get_last_output_path("q2_df_all_")
+    monthly_all_path = get_last_output_path(f"q2_{mode}_all_")
     print(f"📁 Ultimo path mensile trovato: {monthly_all_path}")
 
     print("📦 Recupero ultimo path di output top 5...")
-    top5_path = get_last_output_path("q2_df_top_")
+    top5_path = get_last_output_path(f"q2_{mode}_top_")
     print(f"📁 Ultimo path top 5 trovato: {top5_path}")
 
-    print("📤 Export su Redis del file top 5 in corso...")
+    print("📤 Export su Redis dei risultati in corso...")
     run_command(f"docker exec spark-master python /opt/spark/export/export_q2_hdfs_to_redis.py \"{top5_path}\"")
     print("✅ Export su Redis completato.")
 
     print("📝 Estrazione file CSV mensile completo da HDFS...")
     run_command(
-        f"docker exec namenode bash -c \"hdfs dfs -getmerge {monthly_all_path} /results/q2_df_all_result.csv && "
-        f"echo '✅ File CSV mensile pronto in /results/q2_df_all_result.csv'\""
+        f"docker exec namenode bash -c \"hdfs dfs -getmerge {monthly_all_path} /results/{CSV_ALL_RESULT} && "
+        f"echo '✅ File CSV mensile pronto in /results/{CSV_ALL_RESULT}'\""
     )
 
     print("📝 Estrazione file CSV top 5 da HDFS...")
     run_command(
-        f"docker exec namenode bash -c \"hdfs dfs -getmerge {top5_path} /results/q2_df_top_result.csv && "
-        f"echo '✅ File CSV top 5 pronto in /results/q2_df_top_result.csv'\""
+        f"docker exec namenode bash -c \"hdfs dfs -getmerge {top5_path} /results/{CSV_TOP5_RESULT} && "
+        f"echo '✅ File CSV top 5 pronto in /results/{CSV_TOP5_RESULT}'\""
     )
 
     print("📁 File CSV disponibili nella directory 'Results':")
-    print("  - Results/csv/q2_df_all_result.csv")
-    print("  - Results/csv/q2_df_top_result.csv")
+    print(f"  - Results/csv/{CSV_ALL_RESULT}")
+    print(f"  - Results/csv/{CSV_TOP5_RESULT}")
+    
+    print("📊 Generazione grafici in corso...")
+    run_command(f"python3 ./scripts/grafana/create_q2_plots.py {CSV_ALL_RESULT}")
+    print("✅ Grafici generati con successo nella directory 'Results/images'.")
     
 if __name__ == "__main__":
     main()
