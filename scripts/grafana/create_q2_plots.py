@@ -35,6 +35,13 @@ def save_dashboard():
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='data-testid Save dashboard drawer button']:not([disabled])"))).click()
 
         print("✅ Dashboard salvata tramite Selenium.")
+        
+        # 🔄 Ricarica la pagina per assicurarsi che i dati aggiornati siano caricati
+        time.sleep(1)
+        driver.refresh()
+        print("🔁 Dashboard ricaricata.")
+        time.sleep(2)  # Dai un attimo a Grafana per ricaricare
+        
     except Exception as e:
         print("⚠️ Errore salvataggio dashboard:", e)
 
@@ -168,8 +175,6 @@ save_dashboard()
 
 driver.quit()
 
-time.sleep(5)
-
 # 4. Render PNG per Carbon Intensity
 os.makedirs(PNG_OUTPUT_PATH, exist_ok=True)
 render_url = f"{GRAFANA_URL}/render/d/{dashboard_uid}/q2-dashboard-csv-{timestamp}?orgId=1&panelId=1&width=1000&height=600"
@@ -220,8 +225,6 @@ time.sleep(2)
 save_dashboard()
 
 driver.quit()
-
-time.sleep(5)
 
 # 7. Render PNG per CFE
 img_cfe = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)

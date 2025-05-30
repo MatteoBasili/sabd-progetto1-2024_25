@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   namenode:
     image: apache/hadoop:3.3.6
@@ -93,7 +91,7 @@ services:
     volumes:
       - ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
       - ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
-      - ./scripts/nifi:/opt/nifi/init-scripts
+      - ./nifi/generate_data_urls.groovy:/opt/nifi/init-scripts/generate_data_urls.groovy
       - ./nifi/templates:/opt/nifi/nifi-current/conf/templates
     depends_on:
       - namenode

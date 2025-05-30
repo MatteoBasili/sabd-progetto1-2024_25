@@ -1,182 +1,125 @@
 import requests
+import os
 import time
 
-NIFI_API = "http://localhost:8080/nifi-api"
-TEMPLATE_FILE_PATH = "./nifi/templates/data_acquisition_and_ingestion_flow.xml"
-TEMPLATE_NAME = "data_acquisition_and_ingestion_flow"
+# Config
+NIFI_API_URL = "http://localhost:8080/nifi-api"
+TEMPLATE_PATH = "./nifi/templates/data_acquisition_and_ingestion_flow.xml"
 
-HEADERS = {"Content-Type": "application/json"}
+def upload_template(template_path):
+    print(f"⬆️ Carico il template da: {template_path}")
+    with open(template_path, 'rb') as f:
+        response = requests.post(
+            f"{NIFI_API_URL}/process-groups/root/templates/upload",
+            files={'template': f}
+        )
 
-def get_root_process_group_id():
-    r = requests.get(f"{NIFI_API}/flow/process-groups/root")
-    r.raise_for_status()
-    return r.json()["processGroupFlow"]["id"]
+    if response.status_code == 201:
+        try:
+            return response.json()['template']['id']
+        except Exception:
+            print("⚠️ Nessuna risposta JSON. Template caricato comunque.")
+            return find_template_id_by_name(template_path)
 
-def get_controller_services(pg_id):
-    r = requests.get(f"{NIFI_API}/process-groups/{pg_id}/controller-services")
-    r.raise_for_status()
-    return r.json()["controllerServices"]
+    elif response.status_code == 409:
+        print("⚠️ Template già presente. Lo recupero...")
+        return find_template_id_by_name(template_path)
 
-def update_controller_service_state(service, state):
-    service_id = service["id"]
-    version = service["revision"]["version"]
-    payload = {
-        "revision": {"version": version},
-        "component": {
-            "id": service_id,
-            "state": state  # "ENABLED" or "DISABLED"
-        }
-    }
-    r = requests.put(f"{NIFI_API}/controller-services/{service_id}/run-status", json=payload)
-    r.raise_for_status()
+    else:
+        print(response.text)
+        raise RuntimeError("❌ Upload fallito.")
 
-def delete_controller_service(service):
-    service_id = service["id"]
-    version = service["revision"]["version"]
-    r = requests.delete(f"{NIFI_API}/controller-services/{service_id}?version={version}")
-    r.raise_for_status()
+def find_template_id_by_name(template_path):
+    template_name = os.path.basename(template_path).replace(".xml", "")
+    response = requests.get(f"{NIFI_API_URL}/flow/templates")
+    for t in response.json().get("templates", []):
+        if t["template"]["name"] == template_name:
+            return t["template"]["id"]
+    raise RuntimeError("❌ Template non trovato.")
 
-def get_processors(pg_id):
-    r = requests.get(f"{NIFI_API}/process-groups/{pg_id}/processors")
-    r.raise_for_status()
-    return r.json()["processors"]
+def instantiate_template(template_id, x=0, y=0):
+    print(f"📦 Istanzio il template: {template_id}")
+    url = f"{NIFI_API_URL}/process-groups/root/template-instance"
+    payload = {"templateId": template_id, "originX": x, "originY": y}
+    response = requests.post(url, json=payload)
+    response.raise_for_status()
 
-def stop_processor(processor):
-    processor_id = processor["id"]
-    version = processor["revision"]["version"]
-    payload = {
-        "revision": {"version": version},
-        "state": "STOPPED"
-    }
-    r = requests.put(f"{NIFI_API}/processors/{processor_id}/run-status", json=payload)
-    r.raise_for_status()
-
-def start_processor(processor):
-    processor_id = processor["id"]
-    version = processor["revision"]["version"]
-    payload = {
-        "revision": {"version": version},
-        "state": "RUNNING"
-    }
-    r = requests.put(f"{NIFI_API}/processors/{processor_id}/run-status", json=payload)
-    r.raise_for_status()
-
-def get_connections(pg_id):
-    r = requests.get(f"{NIFI_API}/process-groups/{pg_id}/connections")
-    r.raise_for_status()
-    return r.json()["connections"]
-
-def delete_connection(connection):
-    connection_id = connection["id"]
-    version = connection["revision"]["version"]
-    r = requests.delete(f"{NIFI_API}/connections/{connection_id}?version={version}")
-    r.raise_for_status()
-
-def delete_processor(processor):
-    processor_id = processor["id"]
-    version = processor["revision"]["version"]
-    r = requests.delete(f"{NIFI_API}/processors/{processor_id}?version={version}")
-    r.raise_for_status()
-
-def get_templates():
-    r = requests.get(f"{NIFI_API}/flow/templates")
-    r.raise_for_status()
-    return r.json()["templates"]
-
-def delete_template(template):
-    template_id = template["id"]
-    r = requests.delete(f"{NIFI_API}/templates/{template_id}")
-    r.raise_for_status()
-
-def upload_template(pg_id):
-    with open(TEMPLATE_FILE_PATH, "rb") as f:
-        files = {'template': (TEMPLATE_FILE_PATH, f, 'application/xml')}
-        r = requests.post(f"{NIFI_API}/process-groups/{pg_id}/templates/upload", files=files)
-        r.raise_for_status()
-        return r.json()["template"]["id"]
-
-def instantiate_template(pg_id, template_id):
-    payload = {
-        "templateId": template_id,
-        "originX": 0.0,
-        "originY": 0.0
-    }
-    r = requests.post(f"{NIFI_API}/process-groups/{pg_id}/template-instance", json=payload)
-    r.raise_for_status()
-    return r.json()["flow"]["processGroups"]
+    print("🔍 Recupero il nuovo process group...")
+    time.sleep(1)  # Attendi per sicurezza
+    groups = requests.get(f"{NIFI_API_URL}/flow/process-groups/root").json()
+    for pg in groups['processGroupFlow']['flow']['processGroups']:
+        if pg['component']['name'].startswith("data_acquisition"):
+            return pg['component']['id']
+    raise RuntimeError("❌ Process Group non trovato.")
 
 def enable_controller_services(pg_id):
-    services = get_controller_services(pg_id)
+    print(f"⚙️ Abilitazione controller services per process group: {pg_id}")
+    url = f"{NIFI_API_URL}/flow/process-groups/{pg_id}/controller-services"
+    services = requests.get(url).json()["controllerServices"]
+
     for svc in services:
-        if svc["component"]["state"] != "ENABLED":
-            update_controller_service_state(svc, "ENABLED")
+        svc_id = svc['component']['id']
+        state = svc['component']['state']
+        name = svc['component']['name']
+        if state != "ENABLED":
+            print(f"🔄 Abilitazione: {name}")
+            svc_url = f"{NIFI_API_URL}/controller-services/{svc_id}/run-status"
+            body = {
+                "revision": svc["revision"],
+                "state": "ENABLED"
+            }
+            r = requests.put(svc_url, json=body)
+            if r.status_code not in (200, 202):
+                print(f"❌ Errore abilitando {name}: {r.text}")
+            else:
+                print(f"✅ {name} abilitato.")
 
-def start_all_processors(pg_id):
-    processors = get_processors(pg_id)
-    for p in processors:
-        start_processor(p)
+def list_processors(pg_id):
+    url = f"{NIFI_API_URL}/process-groups/{pg_id}/processors"
+    response = requests.get(url)
+    response.raise_for_status()
+    processors = response.json()["processors"]
+    return [(p["id"], p["component"]["name"]) for p in processors]
 
-def clean_canvas(pg_id):
-    # 1. Disable and delete controller services
-    print("Disabling and deleting controller services...")
-    services = get_controller_services(pg_id)
-    for svc in services:
-        if svc["component"]["state"] == "ENABLED":
-            update_controller_service_state(svc, "DISABLED")
-    # Wait a moment for disable to take effect
-    time.sleep(2)
-    for svc in services:
-        delete_controller_service(svc)
-
-    # 2. Stop all processors
-    print("Stopping all processors...")
-    processors = get_processors(pg_id)
-    for p in processors:
-        if p["component"]["state"] == "RUNNING":
-            stop_processor(p)
-    time.sleep(2)
-
-    # 3. Delete all connections (queues)
-    print("Deleting all connections (queues)...")
-    connections = get_connections(pg_id)
-    for c in connections:
-        delete_connection(c)
-    time.sleep(2)
-
-    # 4. Delete all processors
-    print("Deleting all processors...")
-    processors = get_processors(pg_id)
-    for p in processors:
-        delete_processor(p)
+def start_processor(proc_id):
+    url = f"{NIFI_API_URL}/processors/{proc_id}/run-status"
+    print(f"▶️ Avvio processore: {proc_id}")
+    proc_info = requests.get(f"{NIFI_API_URL}/processors/{proc_id}").json()
+    body = {
+        "revision": proc_info["revision"],
+        "state": "RUNNING"
+    }
+    r = requests.put(url, json=body)
+    if r.status_code in (200, 202):
+        print("✅ Avviato.")
+    else:
+        print(f"❌ Errore: {r.text}")
 
 def main():
-    root_pg_id = get_root_process_group_id()
-    print(f"Root process group id: {root_pg_id}")
+    template_id = upload_template(TEMPLATE_PATH)
+    pg_id = instantiate_template(template_id)
+    enable_controller_services(pg_id)
 
-    # Clean canvas
-    clean_canvas(root_pg_id)
+    print("\n📋 Lista dei processori disponibili:")
+    processors = list_processors(pg_id)
+    for idx, (_, name) in enumerate(processors):
+        print(f"{idx + 1}. {name}")
 
-    # Manage template
-    print("Checking existing templates...")
-    templates = get_templates()
-    existing_template = next((t for t in templates if t["template"]["name"] == TEMPLATE_NAME), None)
-    if existing_template:
-        print(f"Deleting existing template {TEMPLATE_NAME}...")
-        delete_template(existing_template["template"])
+    while True:
+        choice = input("\nInserisci il numero del processore da avviare (0 per uscire): ")
+        if not choice.isdigit():
+            print("❗ Inserisci un numero valido.")
+            continue
 
-    print("Uploading template...")
-    template_id = upload_template(root_pg_id)
-
-    print(f"Instantiating template {template_id}...")
-    instantiate_template(root_pg_id, template_id)
-
-    print("Enabling controller services...")
-    enable_controller_services(root_pg_id)
-
-    print("Starting all processors...")
-    start_all_processors(root_pg_id)
-
-    print("Done!")
+        choice = int(choice)
+        if choice == 0:
+            break
+        elif 1 <= choice <= len(processors):
+            proc_id, name = processors[choice - 1]
+            print(f"➡️ Avvio {name}...")
+            start_processor(proc_id)
+        else:
+            print("❗ Numero non valido.")
 
 if __name__ == "__main__":
     main()
