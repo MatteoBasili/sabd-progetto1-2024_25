@@ -3,7 +3,7 @@ import time
 import statistics
 import sys
 
-NUM_RUNS = 10
+NUM_RUNS = 3
 DOCKER_COMPOSE_PATH = "."  # Modifica se il docker-compose.yml non è in cwd
 
 def stop_and_remove_spark_containers():
