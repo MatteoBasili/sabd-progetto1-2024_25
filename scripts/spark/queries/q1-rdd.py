@@ -1,21 +1,17 @@
-from pyspark.sql import SparkSession
+from pyspark import SparkConf, SparkContext
 from datetime import datetime
-from collections import defaultdict
-import csv
-import io
 
 def parse_line(line):
-    # Parsing CSV string safely (inclusi eventuali valori con virgole)
-    values = next(csv.reader([line]))
     try:
-        dt = values[0]
-        year = int(dt[:4])
-        country = values[1]
-        carbon = float(values[2])
-        cfe = float(values[3])
+        parts = line.split(",")
+        dt = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+        year = int(dt.strftime("%Y"))
+        country = parts[1]
+        carbon = float(parts[2])
+        cfe = float(parts[3])
         return ((year, country), (carbon, cfe, 1, carbon, carbon, cfe, cfe))
     except:
-        return None  # skip malformed lines
+        return None
 
 def combine(a, b):
     return (
@@ -29,11 +25,8 @@ def combine(a, b):
     )
 
 if __name__ == "__main__":
-    spark = SparkSession.builder \
-        .appName("ElectricityStatsQ1RDD_CSV") \
-        .getOrCreate()
-
-    sc = spark.sparkContext
+    conf = SparkConf().setAppName("ElectricityStatsQ1RDD_CSV")
+    sc = SparkContext(conf=conf)
 
     # Percorsi CSV
     path_it = "hdfs://namenode:9000/data/electricity/italy_2021_2024_clean.csv"
@@ -77,5 +70,5 @@ if __name__ == "__main__":
     output_path = f"hdfs://namenode:9000/output/q1_rdd_{timestamp}"
     full_output.saveAsTextFile(output_path)
 
-    spark.stop()
+    sc.stop()
 

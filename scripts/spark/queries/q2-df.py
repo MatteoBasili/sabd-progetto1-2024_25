@@ -23,7 +23,7 @@ if __name__ == "__main__":
     monthly_df = df.groupBy("date").agg(
         round(avg("carbon-intensity"), 6).alias("carbon-intensity"),
         round(avg("cfe"), 6).alias("cfe")
-    )
+    ).cache()
 
     # ---- Parte 1: Salva CSV completo per grafici ----
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
