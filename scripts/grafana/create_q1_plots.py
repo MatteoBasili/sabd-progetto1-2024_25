@@ -192,9 +192,14 @@ driver = webdriver.Chrome(options=options)
 
 driver.get(f"{GRAFANA_URL}/login")
 time.sleep(2)
-driver.find_element(By.NAME, "user").send_keys(USERNAME)
-driver.find_element(By.NAME, "password").send_keys(PASSWORD)
-driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+# Inserisce username
+driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Username input field']").send_keys(USERNAME)
+
+# Inserisce password
+driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Password input field']").send_keys(PASSWORD)
+
+# Clicca il bottone di login
+driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Login button']").click()
 time.sleep(2)
 
 dashboard_url = f"{GRAFANA_URL}/d/{dashboard_uid}/q1-dashboard-csv-{timestamp}?orgId=1"
@@ -248,9 +253,14 @@ print("✅ Pannello aggiornato per CFE.")
 driver = webdriver.Chrome(options=options)
 driver.get(f"{GRAFANA_URL}/login")
 time.sleep(2)
-driver.find_element(By.NAME, "user").send_keys(USERNAME)
-driver.find_element(By.NAME, "password").send_keys(PASSWORD)
-driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+# Inserisce username
+driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Username input field']").send_keys(USERNAME)
+
+# Inserisce password
+driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Password input field']").send_keys(PASSWORD)
+
+# Clicca il bottone di login
+driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Login button']").click()
 time.sleep(2)
 driver.get(dashboard_url)
 time.sleep(2)

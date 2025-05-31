@@ -41,7 +41,7 @@ def main():
     print(f"📁 Ultimo path di output trovato: {last_path}")
 
     print("📤 Export su Redis dei risultati in corso...")
-    run_command(f"docker exec spark-master python /opt/spark/export/export_q1_hdfs_to_redis.py \"{last_path}\"")
+    run_command(f"docker exec results_exporter python /src/export_q1_hdfs_to_redis.py \"{last_path}\"")
     print("✅ Export su Redis completato.")
 
     print("📝 Estrazione file CSV da HDFS...")

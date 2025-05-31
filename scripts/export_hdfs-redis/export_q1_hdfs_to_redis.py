@@ -1,13 +1,14 @@
 import sys
+import os
 from hdfs import InsecureClient
 import redis
 
-def main(hdfs_output_path):
+def main(hdfs_output_path, hdfs_host, redis_host, redis_port):
     # Connetti a WebHDFS
-    hdfs_client = InsecureClient('http://namenode:9870', user='root')
+    hdfs_client = InsecureClient(f'http://{hdfs_host}:9870', user='root')
 
     # Connetti a Redis
-    redis_client = redis.Redis(host='redis', port=6379, decode_responses=True)
+    redis_client = redis.Redis(host=redis_host, port=int(redis_port), decode_responses=True)
     pipe = redis_client.pipeline(transaction=False)
 
     # Lista i file part-*
@@ -46,7 +47,12 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python export_q1_hdfs_to_redis.py <hdfs_output_path>")
         sys.exit(1)
+        
+    # Parametri da env o default
+    HDFS_HOST = os.getenv('HDFS_HOST', 'namenode')
+    REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
+    REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 
     hdfs_output_dir = sys.argv[1]
-    main(hdfs_output_dir)
+    main(hdfs_output_dir, HDFS_HOST, REDIS_HOST, REDIS_PORT)
 

@@ -99,8 +99,7 @@ services:
       - sabd_network
       
   spark-master:
-    build:
-      context: ./spark/docker
+    image: bitnami/spark:3.5.1
     container_name: spark-master
     hostname: spark-master
     user: root
@@ -112,7 +111,6 @@ services:
     volumes:
       - ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
       - ./scripts/spark/queries:/opt/spark/work-dir
-      - ./scripts/spark/export:/opt/spark/export
     depends_on:
       - namenode
       - datanode1
@@ -190,6 +188,25 @@ services:
       - "6379:6379"
     depends_on:
       - namenode
+    networks:
+      - sabd_network
+      
+  results_exporter:
+    build:
+      context: ./results_exporter/docker
+    container_name: results_exporter
+    hostname: results_exporter
+    user: root
+    environment:
+      - HDFS_HOST=namenode
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./scripts/export_hdfs-redis:/src
+    depends_on:
+      - namenode
+      - redis
+    command: sleep infinity
     networks:
       - sabd_network
 
