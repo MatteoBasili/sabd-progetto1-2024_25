@@ -31,7 +31,6 @@ def save_dashboard():
 
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid*='Panel menu']"))).click()
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[data-testid*='Panel menu item Edit']"))).click()
-        #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='time-series-zoom-to-data']:not([disabled])"))).click()
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='data-testid Save dashboard button']"))).click()
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='data-testid Save dashboard drawer button']:not([disabled])"))).click()
 
@@ -92,6 +91,7 @@ if res_ds.status_code not in (200, 409):
 print("✅ Datasource creato.")
 
 # 2. Crea la dashboard con il pannello per Carbon Intensity
+today_str = datetime.utcnow().strftime("%Y-%m-%d")
 dashboard_payload = {
     "dashboard": {
         "id": None,
@@ -99,8 +99,8 @@ dashboard_payload = {
         "title": dashboard_title,
         "timezone": "browser",
         "time": {
-            "from": "2025-01-01T00:00:00Z",
-            "to": "2025-01-01T23:59:59Z"
+            "from": f"{today_str}T00:00:00Z",
+            "to": f"{today_str}T23:00:00Z"
         },
         "panels": [
             {
