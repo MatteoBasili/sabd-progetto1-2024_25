@@ -6,6 +6,14 @@ import sys
 NUM_RUNS = 3
 DOCKER_COMPOSE_PATH = "."  # Modifica se il docker-compose.yml non è in cwd
 
+def stop_and_remove_other_containers():
+    print("Stopping other containers...")
+    subprocess.run(["docker-compose", "stop", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
+                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    print("Removing other containers...")
+    subprocess.run(["docker-compose", "rm", "-f", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
+                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
 def stop_and_remove_spark_containers():
     print("Stopping Spark containers...")
     subprocess.run(["docker-compose", "stop", "spark-worker-1", "spark-worker-2", "spark-master"],
@@ -58,6 +66,7 @@ def main():
     ]
 
     durations = []
+    stop_and_remove_other_containers()
     for i in range(1, NUM_RUNS + 1):
         print(f"\n=== RUN {i} ===")
         stop_and_remove_spark_containers()

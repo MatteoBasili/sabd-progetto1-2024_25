@@ -3,7 +3,7 @@ import time
 import statistics
 import sys
 
-NUM_RUNS = 3
+NUM_RUNS = 3 #10
 DOCKER_COMPOSE_PATH = "."  # Modifica se il docker-compose.yml non è in cwd
 
 def stop_and_remove_other_containers():
@@ -46,7 +46,7 @@ def run_spark_job(command):
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in ["rdd", "df", "sql"]:
-        print("❗️Uso: python3 run_q2_isolated.py [rdd|df|sql]")
+        print("❗️Uso: python3 run_q3_isolated.py [rdd|df|sql]")
         sys.exit(1)
 
     mode = sys.argv[1]
@@ -56,13 +56,13 @@ def main():
     else:
         work_dir = "/opt/spark/work-dir/"
         
-    output_file = f"./Results/analysis/performance_q2_{mode}_stats.txt"
+    output_file = f"./Results/analysis/performance_q3_{mode}_stats.txt"
     
     # Comando per lanciare il job Spark all'interno del container spark-master
     spark_submit_command = [
         "docker", "exec", "spark-master",
         "spark-submit",
-        f"{work_dir}q2-{mode}.py"
+        f"{work_dir}q3-{mode}.py"
     ]
 
     durations = []

@@ -66,7 +66,7 @@ def main():
     print(f"  - Results/csv/{CSV_STATS_RESULT}")
     
     print("📊 Generazione grafici in corso...")
-    #run_command(f"python3 ./scripts/grafana/create_q3_plots.py {CSV_HOURLY_RESULT}")
+    run_command(f"python3 ./scripts/grafana/create_q3_plots.py {CSV_HOURLY_RESULT}")
     print("✅ Grafici generati con successo nella directory 'Results/images'.")
     
 if __name__ == "__main__":

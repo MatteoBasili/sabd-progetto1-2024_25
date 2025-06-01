@@ -4,8 +4,6 @@ from datetime import datetime
 def parse_line(line):
     try:
         parts = line.split(",")
-        if parts[0] == "datetime":
-            return None
         dt = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
         date = dt.strftime("%Y-%m")
         carbon = float(parts[2])
@@ -38,9 +36,13 @@ if __name__ == "__main__":
     hdfs_path = "hdfs://namenode:9000/data/electricity/italy_2021_2024_clean.csv"
     rdd = sc.textFile(hdfs_path)
     
+    # Rimuovi header
+    header = rdd.first()
+    rdd_data = rdd.filter(lambda row: row != header)
+    
     # Parsing + Aggregazione mensile
     monthly = (
-        rdd.map(parse_line)
+        rdd_data.map(parse_line)
            .filter(lambda x: x is not None)
            .reduceByKey(reduce_values)
            .map(compute_avg)

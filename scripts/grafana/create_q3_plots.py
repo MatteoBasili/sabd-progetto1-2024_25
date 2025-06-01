@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 if len(sys.argv) != 2:
-    print("❗️Uso: python3 create_q1_plots.py [datasource.csv]")
+    print("❗️Uso: python3 create_q3_plots.py [datasource.csv]")
     sys.exit(1)
 
 ds = sys.argv[1]
@@ -31,6 +31,7 @@ def save_dashboard():
 
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid*='Panel menu']"))).click()
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a[data-testid*='Panel menu item Edit']"))).click()
+        #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='time-series-zoom-to-data']:not([disabled])"))).click()
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='data-testid Save dashboard button']"))).click()
         wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='data-testid Save dashboard drawer button']:not([disabled])"))).click()
 
@@ -46,9 +47,9 @@ def save_dashboard():
         print("⚠️ Errore salvataggio dashboard:", e)
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-datasource_name = f"CSV_Q1_DS_{timestamp}"
-dashboard_uid = f"csvq1dashboard{timestamp}"
-dashboard_title = f"Q1 Dashboard CSV {timestamp}"
+datasource_name = f"CSV_Q3_DS_{timestamp}"
+dashboard_uid = f"csvq3dashboard{timestamp}"
+dashboard_title = f"Q3 Dashboard CSV {timestamp}"
 
 headers = {
     "Content-Type": "application/json"
@@ -68,16 +69,12 @@ payload_ds = {
         "header": True,
         "skipRows": 0,
         "delimiter": ",",
-        "timeField": "year",
+        "timeField": "date",
         "columns": [
-            {"selector": "year", "type": "string"},
+            {"selector": "hour", "type": "string"},
             {"selector": "country", "type": "string"},
-            {"selector": "carbon-mean", "type": "string"},
-            {"selector": "carbon-min", "type": "string"},
-            {"selector": "carbon-max", "type": "string"},
-            {"selector": "cfe-mean", "type": "string"},
-            {"selector": "cfe-min", "type": "string"},
-            {"selector": "cfe-max", "type": "string"}
+            {"selector": "carbon-intensity", "type": "string"},
+            {"selector": "cfe", "type": "string"}
         ]
     }
 }
@@ -102,14 +99,14 @@ dashboard_payload = {
         "title": dashboard_title,
         "timezone": "browser",
         "time": {
-            "from": "2019-04-01T13:00:00Z",
-            "to": "2026-08-01T12:59:58Z"
+            "from": "2025-01-01T00:00:00Z",
+            "to": "2025-01-01T23:59:59Z"
         },
         "panels": [
             {
                 "id": 1,
                 "type": "timeseries",
-                "title": "Trend of the Yearly Average Carbon Intensity (gCO₂eq/kWh): IT vs SE",
+                "title": "Trend of the Hourly Average Carbon Intensity (gCO₂eq/kWh), 2021–2024: IT vs SE",
                 "datasource": datasource_name,
                 "targets": [{"refId": "A", "datasource": datasource_name}],
                 "fieldConfig": {
@@ -129,8 +126,8 @@ dashboard_payload = {
                         "id": "convertFieldType",
                         "options": {
                             "conversions": [
-                                {"targetField": "year", "destinationType": "time"},
-                                {"targetField": "carbon-mean", "destinationType": "number"}
+                                {"targetField": "hour", "destinationType": "time", "dateFormat": "HH:mm:ss"},
+                                {"targetField": "carbon-intensity", "destinationType": "number"}
                             ]
                         }
                     },
@@ -149,14 +146,14 @@ dashboard_payload = {
                     {
                         "id": "renameByRegex",
                         "options": {
-                            "regex": "carbon-mean IT",
+                            "regex": "carbon-intensity IT",
                             "renamePattern": "Italy Carbon Intensity"
                         }
                     },
                     {
                         "id": "renameByRegex",
                         "options": {
-                            "regex": "carbon-mean SE",
+                            "regex": "carbon-intensity SE",
                             "renamePattern": "Sweden Carbon Intensity"
                         }
                     }
@@ -202,7 +199,7 @@ driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Password input f
 driver.find_element(By.CSS_SELECTOR, "[data-testid='data-testid Login button']").click()
 time.sleep(2)
 
-dashboard_url = f"{GRAFANA_URL}/d/{dashboard_uid}/q1-dashboard-csv-{timestamp}?orgId=1"
+dashboard_url = f"{GRAFANA_URL}/d/{dashboard_uid}/q3-dashboard-csv-{timestamp}?orgId=1"
 driver.get(dashboard_url)
 time.sleep(2)
 
@@ -212,12 +209,12 @@ driver.quit()
 
 # 4. Render PNG per Carbon Intensity
 os.makedirs(PNG_OUTPUT_PATH, exist_ok=True)
-render_url = f"{GRAFANA_URL}/render/d/{dashboard_uid}/q1-dashboard-csv-{timestamp}?orgId=1&panelId=1&width=1000&height=600"
+render_url = f"{GRAFANA_URL}/render/d/{dashboard_uid}/q3-dashboard-csv-{timestamp}?orgId=1&panelId=1&width=1000&height=600"
 is_rendered = False
 while(is_rendered != True):
     img_carbon = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)
     if img_carbon.status_code == 200:
-        with open(os.path.join(PNG_OUTPUT_PATH, "Q1-Carbon.png"), "wb") as f:
+        with open(os.path.join(PNG_OUTPUT_PATH, "Q3-Carbon.png"), "wb") as f:
             for chunk in img_carbon.iter_content(1024):
                 f.write(chunk)
         print("✅ Grafico Carbon Intensity salvato.")
@@ -227,16 +224,16 @@ while(is_rendered != True):
         print("Riprovando...")
 
 # 5. Aggiorna pannello con dati CFE
-dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Yearly Average CFE (%): IT vs SE"
+dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Hourly Average CFE (%), 2021–2024: IT vs SE"
 dashboard_payload['dashboard']['panels'][0]['fieldConfig']['defaults']['unit'] = "percent"
 dashboard_payload['dashboard']['panels'][0]['targets'][0]['refId'] = "B"
 dashboard_payload['dashboard']['panels'][0]['transformations'][0]['options']['conversions'] = [
-    {"targetField": "year", "destinationType": "time"},
-    {"targetField": "cfe-mean", "destinationType": "number"}
+    {"targetField": "hour", "destinationType": "time", "dateFormat": "HH:mm:ss"},
+    {"targetField": "cfe", "destinationType": "number"}
 ]
-dashboard_payload['dashboard']['panels'][0]['transformations'][2]['options']['regex'] = 'cfe-mean IT'
+dashboard_payload['dashboard']['panels'][0]['transformations'][2]['options']['regex'] = 'cfe IT'
 dashboard_payload['dashboard']['panels'][0]['transformations'][2]['options']['renamePattern'] = 'Italy CFE'
-dashboard_payload['dashboard']['panels'][0]['transformations'][3]['options']['regex'] = 'cfe-mean SE'
+dashboard_payload['dashboard']['panels'][0]['transformations'][3]['options']['regex'] = 'cfe SE'
 dashboard_payload['dashboard']['panels'][0]['transformations'][3]['options']['renamePattern'] = 'Sweden CFE'
 
 dashboard_payload['dashboard']['version'] += 1  # Incrementa versione
@@ -278,7 +275,7 @@ is_rendered = False
 while(is_rendered != True):
     img_cfe = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)
     if img_cfe.status_code == 200:
-        with open(os.path.join(PNG_OUTPUT_PATH, "Q1-CFE.png"), "wb") as f:
+        with open(os.path.join(PNG_OUTPUT_PATH, "Q3-CFE.png"), "wb") as f:
             for chunk in img_cfe.iter_content(1024):
                 f.write(chunk)
         print("✅ Grafico CFE salvato.")

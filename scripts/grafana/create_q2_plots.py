@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 if len(sys.argv) != 2:
-    print("❗️Uso: python3 create_q1_plots.py [datasource.csv]")
+    print("❗️Uso: python3 create_q2_plots.py [datasource.csv]")
     sys.exit(1)
 
 ds = sys.argv[1]
@@ -183,14 +183,18 @@ driver.quit()
 # 4. Render PNG per Carbon Intensity
 os.makedirs(PNG_OUTPUT_PATH, exist_ok=True)
 render_url = f"{GRAFANA_URL}/render/d/{dashboard_uid}/q2-dashboard-csv-{timestamp}?orgId=1&panelId=1&width=1000&height=600"
-img_carbon = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)
-if img_carbon.status_code == 200:
-    with open(os.path.join(PNG_OUTPUT_PATH, "Q2-Carbon.png"), "wb") as f:
-        for chunk in img_carbon.iter_content(1024):
-            f.write(chunk)
-    print("✅ Grafico Carbon Intensity salvato.")
-else:
-    print("❌ Errore rendering Carbon Intensity:", img_carbon.status_code)
+is_rendered = False
+while(is_rendered != True):
+    img_carbon = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)
+    if img_carbon.status_code == 200:
+        with open(os.path.join(PNG_OUTPUT_PATH, "Q2-Carbon.png"), "wb") as f:
+            for chunk in img_carbon.iter_content(1024):
+                f.write(chunk)
+        print("✅ Grafico Carbon Intensity salvato.")
+        is_rendered = True
+    else:
+        print("❌ Errore rendering Carbon Intensity:", img_carbon.status_code)
+        print("Riprovando...")
 
 # 5. Aggiorna pannello con dati CFE
 dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Monthly Average Value of CFE in Italy"
@@ -237,12 +241,16 @@ save_dashboard()
 driver.quit()
 
 # 7. Render PNG per CFE
-img_cfe = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)
-if img_cfe.status_code == 200:
-    with open(os.path.join(PNG_OUTPUT_PATH, "Q2-CFE.png"), "wb") as f:
-        for chunk in img_cfe.iter_content(1024):
-            f.write(chunk)
-    print("✅ Grafico CFE salvato.")
-else:
-    print("❌ Errore rendering CFE:", img_cfe.status_code)
+is_rendered = False
+while(is_rendered != True):
+    img_cfe = requests.get(render_url, auth=HTTPBasicAuth(USERNAME, PASSWORD), stream=True)
+    if img_cfe.status_code == 200:
+        with open(os.path.join(PNG_OUTPUT_PATH, "Q2-CFE.png"), "wb") as f:
+            for chunk in img_cfe.iter_content(1024):
+                f.write(chunk)
+        print("✅ Grafico CFE salvato.")
+        is_rendered = True
+    else:
+        print("❌ Errore rendering CFE:", img_cfe.status_code)
+        print("Riprovando...")
 
