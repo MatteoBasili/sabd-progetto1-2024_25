@@ -1,7 +1,7 @@
 # 💡 SABD Progetto 1 – A.A. 2024/2025
 
 **Corso:** Sistemi e Architetture per Big Data (SABD)  
-**Team:** Matteo Basili, Adriano Trani 
+**Team:** Matteo Basili, Adriano Trani  
 **Docenti:** Valeria Cardellini, Matteo Nardelli  
 **Consegna codice:** 9 giugno 2025  
 **Presentazione orale:** 19 giugno 2025
@@ -34,13 +34,13 @@ L'obiettivo del progetto è elaborare e analizzare dataset sull'intensità di ca
 
 ## 📁 Struttura del repository (DA FARE)
 
-├── hdfs/ # Dati in input/output su HDFS
-├── nifi/ # Template e configurazioni NiFi per l'ingestion
-├── results_exporter/ # Esportazione dei risultati da HDFS (es. verso Redis)
-├── scripts/ # Script Spark per Q1, Q2, Q3
-├── specification/ # Documentazione del progetto
-│ ├── Report/ # Relazione in formato IEEE
-│ └── Results/ # Output CSV delle query
+├── hdfs/ # Dati in input/output su HDFS  
+├── nifi/ # Template e configurazioni NiFi per l'ingestion  
+├── results_exporter/ # Esportazione dei risultati da HDFS (es. verso Redis)  
+├── scripts/ # Script Spark per Q1, Q2, Q3  
+├── specification/ # Documentazione del progetto  
+│ ├── Report/ # Relazione in formato IEEE  
+│ └── Results/ # Output CSV delle query  
 ├── docker-compose.yml # Configurazione cluster (Spark, NiFi, ecc.)
 
 ---
