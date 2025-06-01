@@ -34,7 +34,7 @@ def main(hdfs_output_path, hdfs_host, redis_host, redis_port):
                 perc_75 = parts[5]
                 max = parts[6]
 
-                key = f"{country}:{data}"
+                key = f"Q3:{country}:{data}"
                 value = {
                     "min": min,
                     "25-perc": perc_25,

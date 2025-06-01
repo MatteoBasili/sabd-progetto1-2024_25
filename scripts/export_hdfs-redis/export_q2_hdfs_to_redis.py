@@ -32,7 +32,7 @@ def main(hdfs_output_path, hdfs_host, redis_host, redis_port):
                 order_type = parts[3]
                 rank = parts[4]
 
-                key = f"IT:{order_type}:{rank}"
+                key = f"Q2:IT:{order_type}:{rank}"
                 value = {
                     "date": date,
                     "carbon": carbon,

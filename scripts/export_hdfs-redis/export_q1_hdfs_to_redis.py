@@ -26,7 +26,7 @@ def main(hdfs_output_path, hdfs_host, redis_host, redis_port):
                     continue  # ignora righe incomplete
 
                 year, country = parts[0], parts[1]
-                key = f"{country}:{year}"
+                key = f"Q1:{country}:{year}"
                 value = {
                     "carbon_mean": parts[2],
                     "carbon_min": parts[3],
