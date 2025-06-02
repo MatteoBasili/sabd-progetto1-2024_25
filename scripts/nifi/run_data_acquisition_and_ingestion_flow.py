@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 
 NIFI_API = "http://localhost:8080/nifi-api"
 PROCESS_GROUP_ID = "root"  # root canvas
+WAIT_SECONDS = 2
 
 def get_all_processor_ids():
     url = f"{NIFI_API}/flow/process-groups/{PROCESS_GROUP_ID}"
@@ -24,7 +25,7 @@ def stop_all_processors():
                 "disconnectedNodeAcknowledged": False
             }
             requests.put(url, json=body)
-    time.sleep(2)
+    time.sleep(WAIT_SECONDS)
 
 def get_all_controller_services():
     url = f"{NIFI_API}/flow/process-groups/{PROCESS_GROUP_ID}/controller-services"
@@ -43,7 +44,7 @@ def disable_all_controller_services():
                 "state": "DISABLED"
             }
             requests.put(url, json=body)
-    time.sleep(2)
+    time.sleep(WAIT_SECONDS)
 
 def get_all_connections():
     url = f"{NIFI_API}/flow/process-groups/{PROCESS_GROUP_ID}"
@@ -66,7 +67,7 @@ def drop_all_queues():
             check = requests.get(check_url).json()
             if check['dropRequest']['finished']:
                 break
-            time.sleep(1)
+            time.sleep(WAIT_SECONDS)
 
 def delete_all_connections():
     print("Deleting all existing connections...")
@@ -145,7 +146,7 @@ def enable_all_controller_services():
                 "state": "ENABLED"
             }
             requests.put(url, json=body)
-    time.sleep(2)
+    time.sleep(WAIT_SECONDS)
 
 def delete_template_by_name(template_name):
     print(f"Checking if template '{template_name}' already exists...")
@@ -222,11 +223,6 @@ def stop_processor(pid):
     }
     requests.put(url, json=body)
 
-def queue_size(connection_id):
-    url = f"{NIFI_API}/flowfile-queues/{connection_id}"
-    response = requests.get(url)
-    return int(response.json()['queueSize']['objectCount'])
-
 def get_all_processor_names():
     url = f"{NIFI_API}/flow/process-groups/{PROCESS_GROUP_ID}"
     response = requests.get(url)
@@ -240,9 +236,9 @@ def simulate_data_flow():
 
     # Step 1: Run Init and GenerateDataURLs once
     run_processor_once(processors["Init"])
-    time.sleep(2)
+    time.sleep(WAIT_SECONDS)
     run_processor_once(processors["GenerateDataURLs"])
-    time.sleep(2)
+    time.sleep(WAIT_SECONDS)
 
     # Step 2: Run all remaining processors
     print("▶️ Starting processors...")
@@ -254,7 +250,7 @@ def simulate_data_flow():
     ]
     for name in to_run:
         run_processor(processors[name])
-        time.sleep(2)
+        time.sleep(WAIT_SECONDS)
 
     # Step 3: Monitor until PutHDFS has processed exactly 4 input flowfiles
     print("⏳ Monitoring 'PutHDFS' for completion of exactly 4 input flowfiles...")
@@ -285,7 +281,7 @@ def simulate_data_flow():
             print("✅ PutHDFS has processed exactly 4 flowfiles and is now idle.")
             break
 
-        time.sleep(2)
+        time.sleep(WAIT_SECONDS)
 
     # Step 4: Stop all processors and services
     print("🛑 Stopping all processors and disabling controller services...")

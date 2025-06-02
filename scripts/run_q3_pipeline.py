@@ -1,9 +1,8 @@
 import subprocess
 import sys
-import time
 
-CSV_ALL_RESULT = "q2_all_result.csv"
-CSV_TOP5_RESULT = "q2_top_result.csv"
+CSV_HOURLY_RESULT = "q3_hourly_result.csv"
+CSV_STATS_RESULT = "q3_stats_result.csv"
 
 def run_command(command, capture_output=False):
     print(f"⚙️  Eseguo: {command}")
@@ -25,7 +24,7 @@ def get_last_output_path(prefix):
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in ["rdd", "df", "sql"]:
-        print("❗️Uso: python3 run_full_q2_pipeline.py [rdd|df|sql]")
+        print("❗️Uso: python3 run_q3_pipeline.py [rdd|df|sql]")
         sys.exit(1)
 
     mode = sys.argv[1]
@@ -35,38 +34,38 @@ def main():
         work_dir = "/opt/spark/work-dir/"
 
     print("🚀 Avvio Spark job...")
-    run_command(f"docker exec spark-master spark-submit {work_dir}q2-{mode}.py")
+    run_command(f"docker exec spark-master spark-submit {work_dir}q3-{mode}.py")
 
-    print("📦 Recupero ultimo path di output mensile completo (per grafici)...")
-    monthly_all_path = get_last_output_path(f"q2_{mode}_all_")
-    print(f"📁 Ultimo path mensile trovato: {monthly_all_path}")
+    print("📦 Recupero ultimo path di output completo per fasce orarie (per grafici)...")
+    hourly_all_path = get_last_output_path(f"q3_{mode}_hourly_")
+    print(f"📁 Ultimo path per fasce orarie trovato: {hourly_all_path}")
 
-    print("📦 Recupero ultimo path di output top 5...")
-    top5_path = get_last_output_path(f"q2_{mode}_top_")
-    print(f"📁 Ultimo path top 5 trovato: {top5_path}")
+    print("📦 Recupero ultimo path di output dei percentili...")
+    stats_path = get_last_output_path(f"q3_{mode}_stats_")
+    print(f"📁 Ultimo path dei percentili trovato: {stats_path}")
 
     print("📤 Export su Redis dei risultati in corso...")
-    run_command(f"docker exec results_exporter python /src/export_q2_hdfs_to_redis.py \"{top5_path}\"")
+    run_command(f"docker exec results_exporter python /src/export_q3_hdfs_to_redis.py \"{stats_path}\"")
     print("✅ Export su Redis completato.")
 
-    print("📝 Estrazione file CSV mensile completo da HDFS...")
+    print("📝 Estrazione file CSV per fasce orarie da HDFS...")
     run_command(
-        f"docker exec namenode bash -c \"hdfs dfs -getmerge {monthly_all_path} /results/{CSV_ALL_RESULT} && "
-        f"echo '✅ File CSV mensile pronto in /results/{CSV_ALL_RESULT}'\""
+        f"docker exec namenode bash -c \"hdfs dfs -getmerge {hourly_all_path} /results/{CSV_HOURLY_RESULT} && "
+        f"echo '✅ File CSV per fasce orarie pronto in /results/{CSV_HOURLY_RESULT}'\""
     )
 
-    print("📝 Estrazione file CSV top 5 da HDFS...")
+    print("📝 Estrazione file CSV dei percentili da HDFS...")
     run_command(
-        f"docker exec namenode bash -c \"hdfs dfs -getmerge {top5_path} /results/{CSV_TOP5_RESULT} && "
-        f"echo '✅ File CSV top 5 pronto in /results/{CSV_TOP5_RESULT}'\""
+        f"docker exec namenode bash -c \"hdfs dfs -getmerge {stats_path} /results/{CSV_STATS_RESULT} && "
+        f"echo '✅ File CSV dei percentili pronto in /results/{CSV_STATS_RESULT}'\""
     )
 
     print("📁 File CSV disponibili nella directory 'Results':")
-    print(f"  - Results/csv/{CSV_ALL_RESULT}")
-    print(f"  - Results/csv/{CSV_TOP5_RESULT}")
+    print(f"  - Results/csv/{CSV_HOURLY_RESULT}")
+    print(f"  - Results/csv/{CSV_STATS_RESULT}")
     
     print("📊 Generazione grafici in corso...")
-    run_command(f"python3 ./scripts/grafana/create_q2_plots.py {CSV_ALL_RESULT}")
+    run_command(f"python3 ./scripts/grafana/create_q3_plots.py {CSV_HOURLY_RESULT}")
     print("✅ Grafici generati con successo nella directory 'Results/images'.")
     
 if __name__ == "__main__":

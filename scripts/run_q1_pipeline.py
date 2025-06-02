@@ -1,6 +1,5 @@
 import subprocess
 import sys
-import time
 
 CSV_RESULT = "q1_result.csv"
 
@@ -24,7 +23,7 @@ def get_last_output_path(prefix):
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in ["rdd", "df", "sql"]:
-        print("❗️Uso: python3 run_full_q1_pipeline.py [rdd|df|sql]")
+        print("❗️Uso: python3 run_q1_pipeline.py [rdd|df|sql]")
         sys.exit(1)
 
     mode = sys.argv[1]
