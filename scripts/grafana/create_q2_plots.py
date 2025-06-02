@@ -104,7 +104,7 @@ dashboard_payload = {
             {
                 "id": 1,
                 "type": "timeseries",
-                "title": "Trend of the Monthly Average Value of Carbon Intensity in Italy",
+                "title": "Trend of the Monthly Average Value of Carbon Intensity in Italy, 2021–2024",
                 "datasource": datasource_name,
                 "targets": [{"refId": "A", "datasource": datasource_name}],
                 "fieldConfig": {
@@ -197,7 +197,7 @@ while(is_rendered != True):
         print("Riprovando...")
 
 # 5. Aggiorna pannello con dati CFE
-dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Monthly Average Value of CFE in Italy"
+dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Monthly Average Value of CFE in Italy, 2021–2024"
 dashboard_payload['dashboard']['panels'][0]['fieldConfig']['defaults']['displayName'] = "CFE (%)"
 dashboard_payload['dashboard']['panels'][0]['fieldConfig']['defaults']['unit'] = "percent"
 dashboard_payload['dashboard']['panels'][0]['targets'][0]['refId'] = "B"

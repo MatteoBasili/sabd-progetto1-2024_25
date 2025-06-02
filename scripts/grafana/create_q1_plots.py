@@ -109,7 +109,7 @@ dashboard_payload = {
             {
                 "id": 1,
                 "type": "timeseries",
-                "title": "Trend of the Yearly Average Carbon Intensity (gCO₂eq/kWh): IT vs SE",
+                "title": "Trend of the Yearly Average Carbon Intensity (gCO₂eq/kWh), 2021–2024: IT vs SE",
                 "datasource": datasource_name,
                 "targets": [{"refId": "A", "datasource": datasource_name}],
                 "fieldConfig": {
@@ -227,7 +227,7 @@ while(is_rendered != True):
         print("Riprovando...")
 
 # 5. Aggiorna pannello con dati CFE
-dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Yearly Average CFE (%): IT vs SE"
+dashboard_payload['dashboard']['panels'][0]['title'] = "Trend of the Yearly Average CFE (%), 2021–2024: IT vs SE"
 dashboard_payload['dashboard']['panels'][0]['fieldConfig']['defaults']['unit'] = "percent"
 dashboard_payload['dashboard']['panels'][0]['targets'][0]['refId'] = "B"
 dashboard_payload['dashboard']['panels'][0]['transformations'][0]['options']['conversions'] = [

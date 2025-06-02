@@ -8,23 +8,23 @@ DOCKER_COMPOSE_PATH = "."  # Modifica se il docker-compose.yml non è in cwd
 
 def stop_and_remove_other_containers():
     print("Stopping other containers...")
-    subprocess.run(["docker-compose", "stop", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
+    subprocess.run(["docker", "compose", "stop", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print("Removing other containers...")
-    subprocess.run(["docker-compose", "rm", "-f", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
+    subprocess.run(["docker", "compose", "rm", "-f", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def stop_and_remove_spark_containers():
     print("Stopping Spark containers...")
-    subprocess.run(["docker-compose", "stop", "spark-worker-1", "spark-worker-2", "spark-master"],
+    subprocess.run(["docker", "compose", "stop", "spark-worker-1", "spark-worker-2", "spark-master"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print("Removing Spark containers...")
-    subprocess.run(["docker-compose", "rm", "-f", "spark-worker-1", "spark-worker-2", "spark-master"],
+    subprocess.run(["docker", "compose", "rm", "-f", "spark-worker-1", "spark-worker-2", "spark-master"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def start_spark_containers():
     print("Starting Spark containers...")
-    subprocess.run(["docker-compose", "up", "-d", "spark-master", "spark-worker-1", "spark-worker-2"],
+    subprocess.run(["docker", "compose", "up", "-d", "spark-master", "spark-worker-1", "spark-worker-2"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     print("Waiting 15 seconds for Spark to initialize...")
     time.sleep(15)  # Attendere che Spark sia pronto
