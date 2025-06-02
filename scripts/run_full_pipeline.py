@@ -22,7 +22,7 @@ def main():
 
     print(f" Query scelta: {query.capitalize()}")
     print(f"📊 Avvio pipeline...")
-    run_command(f"python3 ./scripts/run_{query}_pipeline.py")
+    run_command(f"python3 ./scripts/run_{query}_pipeline.py {mode}")
     
     print(f"✅ Query {query.capitalize()} completata.")
     
