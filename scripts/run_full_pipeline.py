@@ -20,8 +20,7 @@ def main():
     print("📥 Avvio Acquisizione e Ingestion dei dati...")
     run_command("python3 ./scripts/nifi/run_data_acquisition_and_ingestion_flow.py")
 
-    print(f" Query scelta: {query.capitalize()}")
-    print(f"📊 Avvio pipeline...")
+    print(f"📊 Query scelta: {query.capitalize()}. Metodo selezionato: {mode}. Avvio pipeline...")
     run_command(f"python3 ./scripts/run_{query}_pipeline.py {mode}")
     
     print(f"✅ Query {query.capitalize()} completata.")
