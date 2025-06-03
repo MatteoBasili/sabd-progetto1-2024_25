@@ -1,0 +1,7 @@
+⚙️ Le esecuzioni delle query sono state effettuate in condizioni controllate: nessun altro processo attivo in background e caching disabilitato tra le esecuzioni.
+
+=== PERFORMANCE STATISTICS ===
+Number of runs: 10
+Average execution time: 54.77 seconds
+Standard deviation: 1.62 seconds
+All run times: [54.74, 52.4, 54.76, 53.53, 58.48, 54.32, 54.11, 55.98, 54.2, 55.18]
