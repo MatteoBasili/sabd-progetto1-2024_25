@@ -55,25 +55,6 @@ services:
     networks:
       - sabd_network
         
-  #datanode3:
-    #image: apache/hadoop:3.3.6
-    #container_name: datanode3
-    #hostname: datanode3
-    #user: root
-    #environment:
-     # - HADOOP_HOME=/opt/hadoop
-    #volumes:
-      #- datanode3_data:/opt/hadoop/data/dataNode
-      #- ./hdfs/hadoop_config:/opt/hadoop/etc/hadoop
-      #- ./hdfs/init-datanode.sh:/init-datanode.sh
-    #ports:
-     # - "9866:9864"
-    #depends_on:
-     # - namenode
-    #command: [ "/bin/bash", "/init-datanode.sh" ]
-    #networks:
-     # - sabd_network
-        
   nifi:
     image: apache/nifi:1.24.0
     container_name: nifi
@@ -92,7 +73,6 @@ services:
       - ./hdfs/hadoop_config/core-site.xml:/opt/nifi/nifi-current/conf/core-site.xml
       - ./hdfs/hadoop_config/hdfs-site.xml:/opt/nifi/nifi-current/conf/hdfs-site.xml
       - ./nifi/generate_data_urls.groovy:/opt/nifi/init-scripts/generate_data_urls.groovy
-      - ./nifi/templates:/opt/nifi/nifi-current/conf/templates
     depends_on:
       - namenode
     networks:
@@ -115,7 +95,6 @@ services:
       - namenode
       - datanode1
       - datanode2
-      #- datanode3
     networks:
       - sabd_network
       

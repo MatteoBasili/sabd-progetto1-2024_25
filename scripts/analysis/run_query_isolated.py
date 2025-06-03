@@ -3,31 +3,25 @@ import time
 import statistics
 import sys
 
-NUM_RUNS = 3
+NUM_RUNS = 10
 DOCKER_COMPOSE_PATH = "."  # Modifica se il docker-compose.yml non è in cwd
 
-def stop_and_remove_other_containers():
-    print("Stopping other containers...")
-    subprocess.run(["docker", "compose", "stop", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
+def reset_the_environment():
+    print("Resetting the environment...")
+    subprocess.run(["docker", "compose", "down", "-v"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    print("Removing other containers...")
-    subprocess.run(["docker", "compose", "rm", "-f", "nifi", "grafana", "grafana-image-renderer", "redis", "results_exporter"],
-                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-def stop_and_remove_spark_containers():
-    print("Stopping Spark containers...")
-    subprocess.run(["docker", "compose", "stop", "spark-worker-1", "spark-worker-2", "spark-master"],
-                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    print("Removing Spark containers...")
-    subprocess.run(["docker", "compose", "rm", "-f", "spark-worker-1", "spark-worker-2", "spark-master"],
+    time.sleep(2)
+    subprocess.run(["docker", "compose", "up", "-d", "namenode", "datanode1", "datanode2", "nifi", "spark-master", "spark-worker-1", "spark-worker-2"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-def start_spark_containers():
-    print("Starting Spark containers...")
-    subprocess.run(["docker", "compose", "up", "-d", "spark-master", "spark-worker-1", "spark-worker-2"],
-                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    print("Waiting 15 seconds for Spark to initialize...")
-    time.sleep(15)  # Attendere che Spark sia pronto
+def do_data_ingestion():
+    print("Acquiring and ingesting data into the HDFS...")
+    ingestion = subprocess.run(["python3 ./scripts/nifi/run_data_acquisition_and_ingestion_flow.py"],
+                   shell=True, text=True, capture_output=False)
+    if ingestion.returncode != 0:
+        print(f"❌ Errore nell'esecuzione: {ingestion.stderr}")
+        sys.exit(ingestion.returncode)
+    return None
 
 def run_spark_job(command):
     print("Running Spark job...")
@@ -45,32 +39,32 @@ def run_spark_job(command):
     return duration
 
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] not in ["rdd", "df", "sql"]:
-        print("❗️Uso: python3 run_q1_isolated.py [rdd|df|sql]")
+    if len(sys.argv) != 3 or sys.argv[1] not in ["q1", "q2", "q3"] or sys.argv[2] not in ["rdd", "df", "sql"]:
+        print("❗️Uso: python3 run_query_isolated.py [q1|q2|q3] [rdd|df|sql]")
         sys.exit(1)
 
-    mode = sys.argv[1]
+    query = sys.argv[1]
+    mode = sys.argv[2]
     
     if mode == "sql":
         work_dir = "/opt/spark/work-dir/sql/"
     else:
         work_dir = "/opt/spark/work-dir/"
         
-    output_file = f"./Results/analysis/performance_q1_{mode}_stats.txt"
+    output_file = f"./Results/analysis/performance_{query}_{mode}_stats.txt"
     
     # Comando per lanciare il job Spark all'interno del container spark-master
     spark_submit_command = [
         "docker", "exec", "spark-master",
         "spark-submit",
-        f"{work_dir}q1-{mode}.py"
+        f"{work_dir}{query}-{mode}.py"
     ]
 
     durations = []
-    stop_and_remove_other_containers()
     for i in range(1, NUM_RUNS + 1):
         print(f"\n=== RUN {i} ===")
-        stop_and_remove_spark_containers()
-        start_spark_containers()
+        reset_the_environment()
+        do_data_ingestion()
         duration = run_spark_job(spark_submit_command)
         durations.append(duration)
         print(f"Run {i} completed in {duration:.2f} seconds")
@@ -79,6 +73,7 @@ def main():
     std_dev = statistics.stdev(durations) if len(durations) > 1 else 0.0
 
     with open(output_file, "w") as f:
+        f.write("⚙️ Le esecuzioni delle query sono state effettuate in condizioni controllate: nessun altro processo attivo in background e caching disabilitato tra le esecuzioni.\n\n")
         f.write("=== PERFORMANCE STATISTICS ===\n")
         f.write(f"Number of runs: {NUM_RUNS}\n")
         f.write(f"Average execution time: {avg_time:.2f} seconds\n")

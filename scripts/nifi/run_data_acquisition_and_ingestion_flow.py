@@ -7,6 +7,22 @@ NIFI_API = "http://localhost:8080/nifi-api"
 PROCESS_GROUP_ID = "root"  # root canvas
 WAIT_SECONDS = 2
 
+def wait_for_nifi_ready(interval=10):
+    print("⏳ Waiting for NiFi to be ready...")
+    url = f"{NIFI_API}/flow/process-groups/{PROCESS_GROUP_ID}"
+
+    while True:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                print("✅ NiFi is ready.")
+                return
+        except requests.exceptions.RequestException:
+            pass
+
+        print("Waiting for NiFi...")
+        time.sleep(interval)
+
 def get_all_processor_ids():
     url = f"{NIFI_API}/flow/process-groups/{PROCESS_GROUP_ID}"
     response = requests.get(url)
@@ -165,6 +181,8 @@ def delete_template_by_name(template_name):
     print(f"No existing template named '{template_name}' found.")
 
 def main():
+    wait_for_nifi_ready()
+
     stop_all_processors()
     disable_all_controller_services()
     drop_all_queues()
@@ -238,7 +256,7 @@ def simulate_data_flow():
     run_processor_once(processors["Init"])
     time.sleep(WAIT_SECONDS)
     run_processor_once(processors["GenerateDataURLs"])
-    time.sleep(WAIT_SECONDS)
+    time.sleep(5)
 
     # Step 2: Run all remaining processors
     print("▶️ Starting processors...")
