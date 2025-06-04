@@ -62,8 +62,8 @@ Assicurati di avere installato i seguenti componenti:
 - **Docker** ≥ 20.10  
 - **Docker Compose** ≥ 1.29  
 - [**Python**](https://www.python.org/) (consigliato: versione 3.8+)
-- [**Google Chrome**](https://www.google.com/chrome/) (necessario per Selenium)
 - **Selenium** versione **4.6+** (richiede Selenium Manager)
+- [**Google Chrome**](https://www.google.com/chrome/) (necessario per Selenium)
 
 Installa le librerie Python necessarie con:
 
