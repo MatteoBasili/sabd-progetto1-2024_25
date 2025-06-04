@@ -3,7 +3,7 @@
 **Corso:** Sistemi e Architetture per Big Data (SABD)  
 **Team:** Matteo Basili, Adriano Trani  
 **Docenti:** Valeria Cardellini, Matteo Nardelli  
-**Consegna codice:** 9 giugno 2025  
+**Consegna codice e relazione:** 9 giugno 2025  
 **Presentazione orale:** 19 giugno 2025
 
 ---
@@ -32,16 +32,21 @@ L'obiettivo del progetto è elaborare e analizzare dataset sull'intensità di ca
 
 ---
 
-## 📁 Struttura del repository (DA FARE)
+## 📁 Struttura del repository
 
-├── hdfs/ # Dati in input/output su HDFS  
-├── nifi/ # Template e configurazioni NiFi per l'ingestion  
-├── results_exporter/ # Esportazione dei risultati da HDFS (es. verso Redis)  
-├── scripts/ # Script Spark per Q1, Q2, Q3  
-├── specification/ # Documentazione del progetto  
-│ ├── Report/ # Relazione in formato IEEE  
-│ └── Results/ # Output CSV delle query  
-├── docker-compose.yml # Configurazione cluster (Spark, NiFi, ecc.)
+| Cartella / File                  | Descrizione                                                                 |
+|----------------------------------|-----------------------------------------------------------------------------|
+| `Report/`                        | Relazione tecnica in formato IEEE proceedings                              |
+| `Results/`                       | Risultati delle query in formato CSV e grafici                             |
+| `Results/analysis/`             | Tempi di processamento sperimentale                                        |
+| `Results/csv/`                  | Output CSV delle query Q1, Q2, Q3                                           |
+| `Results/images/`               | Grafici generati a partire dai risultati delle query                       |
+| `hdfs/`                          | Dati in input/output caricati su HDFS                                      |
+| `nifi/`                          | Template e utilities per Apache NiFi per la data ingestion                 |
+| `results_exporter/docker/`      | Dockerfile per esportazione dei risultati da HDFS verso Redis              |
+| `scripts/`                       | Script per ingestion, processing (Spark RDD/DataFrame/SQL), export e grafici |
+| `specification/`                 | Specifica completa del progetto fornita dai docenti                        |
+| `docker-compose.yml`            | Configurazione completa del cluster (Spark, HDFS, NiFi, ecc.)              |
 
 ---
 
