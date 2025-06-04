@@ -162,7 +162,7 @@ For each query, an experimental analysis of processing times was performed:
 
 ## 📑 Documentation
 
-- 📄 **Technical report**: `Report/sabd_report_basili_trani_2024_25.pdf` (IEEE format)
+- 📄 **Technical report**: `Report/sabd_project1_report_basili_trani_2024_25.pdf` (IEEE format)
 - 🖼️ **System architecture**: included in the report (PDF)
 
 ---
