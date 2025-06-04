@@ -1,78 +1,78 @@
-# 💡 SABD Progetto 1 – A.A. 2024/2025
+# 💡 SABD Project 1 – A.Y. 2024/2025
 
-**Corso:** Sistemi e Architetture per Big Data (SABD)  
+**Course:** Systems and Architectures for Big Data (SABD)  
 **Team:** Matteo Basili, Adriano Trani  
-**Docenti:** Valeria Cardellini, Matteo Nardelli  
-**Consegna codice e relazione:** 9 giugno 2025  
-**Presentazione orale:** 19 giugno 2025
+**Professors:** Valeria Cardellini, Matteo Nardelli  
+**Code and report submission:** June 9, 2025  
+**Oral presentation:** June 19, 2025
 
 ---
 
-## 📌 Obiettivi del progetto
+## 📌 Project Objectives
 
-L'obiettivo del progetto è elaborare e analizzare dataset sull'intensità di carbonio e sulla produzione di energia rinnovabile in Italia e Svezia, utilizzando strumenti Big Data su architetture distribuite. Le query vengono implementate con Apache Spark (usando sia RDD API, sia DataFrame API, sia SQL), e i risultati vengono visualizzati e valutati anche dal punto di vista delle prestazioni.
-
----
-
-## 🛠️ Stack tecnologico
-
-- **Apache Spark** (RDD API + DataFrame API + SQL, modalità cluster su singolo nodo)
-- **Apache NiFi** (per acquisizione e ingestion dei dati)
-- **HDFS** (storage distribuito dei dati)
-- **Docker & Docker Compose** (containerizzazione)
-- **Grafana** (visualizzazione risultati)
-- **Redis** (per l'esportazione)
-- **Python** (linguaggio principale)
+The goal of the project is to process and analyze datasets on carbon intensity and renewable energy production in Italy and Sweden, using Big Data tools on distributed architectures. Queries are implemented with Apache Spark (using RDD API, DataFrame API, and SQL), and results are visualized and also evaluated from a performance perspective.
 
 ---
 
-## 🧱 Schema architetturale (DA FARE)
+## 🛠️ Technology Stack
 
-[Mettere un'immagine .png con link]
-
----
-
-## 📁 Struttura del repository
-
-| Cartella / File                  | Descrizione                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| `Report/`                        | Relazione tecnica in formato IEEE proceedings                              |
-| `Results/`                       | Risultati delle query in formato CSV e grafici                             |
-| `Results/analysis/`             | Tempi di processamento sperimentale                                        |
-| `Results/csv/`                  | Output CSV delle query Q1, Q2, Q3                                           |
-| `Results/images/`               | Grafici generati a partire dai risultati delle query                       |
-| `hdfs/`                          | Configurazioni e utilities per l'HDFS                                      |
-| `nifi/`                          | Template e utilities per Apache NiFi per la data ingestion                 |
-| `results_exporter/docker/`      | Dockerfile per esportazione dei risultati da HDFS verso Redis              |
-| `scripts/`                       | Script per ingestion, processing (Spark RDD/DataFrame/SQL), export e grafici |
-| `specification/`                 | Specifica completa del progetto fornita dai docenti                        |
-| `docker-compose.yml`            | Configurazione completa del cluster (Spark, HDFS, NiFi, ecc.)              |
+- **Apache Spark** (RDD API + DataFrame API + SQL, single-node cluster mode)  
+- **Apache NiFi** (for data acquisition and ingestion)  
+- **HDFS** (distributed data storage)  
+- **Docker & Docker Compose** (containerization)  
+- **Grafana** (results visualization)  
+- **Redis** (for export)  
+- **Python** (main programming language)
 
 ---
 
-## ⚙️ Setup ed esecuzione
+## 🧱 Architectural Diagram (TO DO)
 
-### 🔧 Prerequisiti
+[Add a .png image with link]
 
-> ⚠️ Il progetto è eseguibile **esclusivamente su sistemi Linux**.  
-> ❌ Non è garantita la compatibilità su Windows.
+---
 
-Assicurati di avere installato i seguenti componenti:
+## 📁 Repository Structure
+
+| Folder / File                    | Description                                                                 |
+|---------------------------------|-----------------------------------------------------------------------------|
+| `Report/`                       | Technical report in IEEE proceedings format                                |
+| `Results/`                      | Query results in CSV format and charts                                     |
+| `Results/analysis/`             | Experimental processing times                                              |
+| `Results/csv/`                 | CSV output of queries Q1, Q2, Q3                                           |
+| `Results/images/`              | Charts generated from query results                                       |
+| `hdfs/`                         | Configuration and utilities for HDFS                                      |
+| `nifi/`                         | Apache NiFi templates and utilities for data ingestion                     |
+| `results_exporter/docker/`     | Dockerfile for exporting results from HDFS to Redis                       |
+| `scripts/`                      | Scripts for ingestion, processing (Spark RDD/DataFrame/SQL), export, and charts |
+| `specification/`                | Full project specification provided by professors                         |
+| `docker-compose.yml`           | Complete cluster configuration (Spark, HDFS, NiFi, etc.)                  |
+
+---
+
+## ⚙️ Setup and Execution
+
+### 🔧 Prerequisites
+
+> ⚠️ The project runs **exclusively on Linux systems**.  
+> ❌ Compatibility on Windows is not guaranteed.
+
+Make sure you have the following installed:
 
 - **Docker** ≥ 20.10  
 - **Docker Compose** ≥ 1.29  
-- [**Python**](https://www.python.org/) (consigliato: versione 3.8+)
-- **Selenium** versione **4.6+** (richiede Selenium Manager)
-- [**Google Chrome**](https://www.google.com/chrome/) (necessario per Selenium)
+- [**Python**](https://www.python.org/) (recommended: version 3.8+)  
+- **Selenium** version **4.6+** (requires Selenium Manager)  
+- [**Google Chrome**](https://www.google.com/chrome/) (needed for Selenium)  
 
-Installa le librerie Python necessarie con:
+Install the necessary Python libraries with:
 
 ```bash
 pip install requests selenium
 pip install --upgrade requests urllib3 chardet
 ```
 
-### 🚀 Avvio ambiente
+### 🚀 Start environment
 
 ```bash
 git clone https://github.com/MatteoBasili/sabd-progetto1-2024_25.git
@@ -81,93 +81,93 @@ git checkout main
 docker compose up -d
 ```
 
-Accedi ai servizi:
+Access services at:
 - **Apache NiFi UI:** http://localhost:8080/nifi
 - **HDFS Web UI:** http://localhost:9870
 - **Spark UI (job monitoring):** http://localhost:4040
-- **Grafana UI (visualizzazione):** http://localhost:3000
+- **Grafana UI (visualization):** http://localhost:3000
 
-### 📦 Esecuzione della pipeline
+### 📦 Pipeline execution
 
-Esegui l'intera pipeline (dalla data ingestion fino all'esportazione dei risultati) tramite lo script `run_full_pipeline.py`:
-> 📂 **Lo script va eseguito dalla cartella principale del progetto (root directory).**
+Run the entire pipeline (from data ingestion to exporting results) using the script `run_full_pipeline.py`:
+> 📂 **The script must be run from the project's root directory.**
 ```bash
 python3 ./scripts/run_full_pipeline.py [q1|q2|q3] [rdd|df|sql]
 ```
-- _q1_, _q2_, _q3_ indicano la query da eseguire
-- _rdd_, _df_, _sql_ specificano l'API di Spark da utilizzare
+- _q1_, _q2_, _q3_ indicate the query to run
+- _rdd_, _df_, _sql_ specify the Spark API to use
 
-Lo script si occupa automaticamente di:
-
-1. Avviare il flusso di acquisizione e ingestione dati (NiFi)
-2. Eseguire la query
-3. Esportare i risultati su Redis
-4. Salvare i risultati in formato CSV in _Results/csv/_
-5. Creare i grafici
+The script automatically:
+1. Starts the data acquisition and ingestion flow (NiFi)
+2. Executes the query
+3. Exports the results to Redis
+4. Saves results as CSV in _Results/csv/_
+5. Creates the charts
 
 ---
 
 ## 📊 Dataset
-**Fonte:** [Electricity Maps](https://app.electricitymaps.com/)  
-**Nazioni:** Italia, Svezia  
-**Periodo:** 2021 – 2024  
-**Granularità:** Oraria  
-**Campi rilevanti:**
+
+**Source:** [Electricity Maps](https://app.electricitymaps.com/)  
+**Countries:** Italy, Sweden  
+**Period:** 2021 – 2024  
+**Granularity:** Hourly  
+**Relevant fields:**
 - `Carbon intensity gCO2eq/kWh (direct)`
 - `Carbon-free energy percentage (CFE%)`
 
-I dati vengono caricati in HDFS sia in versione CSV che in versione Parquet dopo essere stati pre-processati e convertiti in formato Parquet tramite NiFi.
+Data are loaded into HDFS both as CSV and Parquet after being pre-processed and converted into Parquet format via NiFi.
 
 ---
 
-## 🔍 Descrizione delle Query
-### 🔹 Q1 – Analisi annuale per nazione
+## 🔍 Query Descriptions
+### 🔹 Q1 – Annual analysis by country
 
-- Calcolo media, minimo e massimo di intensità carbonica e percentuale CFE per ogni anno (2021–2024)
-- Generazione grafici di confronto Italia vs. Svezia
+- Calculate mean, minimum, and maximum of carbon intensity and CFE percentage for each year (2021–2024)
+- Generate comparison charts Italy vs. Sweden
 
-### 🔹 Q2 – Analisi mensile (solo Italia)
+### 🔹 Q2 – Monthly analysis (Italy only)
 
-- Calcolo medie mensili
-- Classifiche top-5 per metrica in ordine crescente/decrescente
-- Grafici per variazione mensile
+- Calculate monthly averages
+- Top-5 rankings for metrics in ascending/descending order
+- Charts for monthly variation
 
-### 🔹 Q3 – Analisi oraria giornaliera
+### 🔹 Q3 – Daily hourly analysis
 
-- Aggregazione per fascia oraria (0–23)
-- Calcolo percentili (min, 25°, 50°, 75°, max)
-- Grafici orari per Italia vs. Svezia
-
----
-
-## 📈 Analisi delle prestazioni
-Per ogni query è stata effettuata un'analisi sperimentale dei tempi di processamento:
-- **Valutazioni:** media e deviazione standard su 10 esecuzioni
-- **Condizioni controllate:** nessun processo in background, caching disabilitato tra esecuzioni
-- **Metriche rilevate:** direttamente dal codice
-- **Confronto SQL vs API:** i tempi Spark SQL sono confrontati con quelli RDD/DataFrame nel report
+- Aggregation by hourly time slot (0–23)
+- Calculate percentiles (min, 25th, 50th, 75th, max)
+- Hourly charts Italy vs. Sweden
 
 ---
 
-## 📤 Output e risultati
+## 📈 Performance Analysis
+For each query, an experimental analysis of processing times was performed:
+- **Evaluations:** mean and standard deviation over 10 runs
+- **Controlled conditions:** no background processes, caching disabled between runs
+- **Metrics collected:** directly from code
+- **SQL vs API comparison:** Spark SQL times compared to RDD/DataFrame APIs in the report
 
-- Tutti i risultati in formato CSV si trovano in:
+---
+
+## 📤 Output and Results
+
+- All CSV results are in:
 > 📂 _Results/csv/_
-- I grafici (da Grafana) si trovano in:
+- Charts (from Grafana) are in:
 > 📂 _Results/images_
-- Le analisi statistiche sui tempi di processamento si trovano in:
+- Statistical analysis of processing times is in:
 > 📂 _Results/analysis_
 
 ---
 
-## 📑 Documentazione
+## 📑 Documentation
 
-- 📄 **Relazione tecnica**: `Report/sabd_report_basili_trani_2024_25.pdf` (formato IEEE)
-- 🖼️ **Architettura del sistema**: inclusa nel report (PDF)
+- 📄 **Technical report**: `Report/sabd_report_basili_trani_2024_25.pdf` (IEEE format)
+- 🖼️ **System architecture**: included in the report (PDF)
 
 ---
 
-## 🤝 Collaboratori
+## 🤝 Contributors
 
 - **Matteo Basili** – [GitHub Profile](https://github.com/MatteoBasili)
 - **Adriano Trani** – [GitHub Profile](https://github.com/AdrianoTrani)
