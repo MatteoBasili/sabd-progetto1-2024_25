@@ -72,19 +72,38 @@ pip install requests selenium
 pip install --upgrade requests urllib3 chardet
 ```
 
-### 🚀 Avvio ambiente (DA FARE)
+### 🚀 Avvio ambiente
 
-????????????????????```bash
+```bash
 git clone https://github.com/MatteoBasili/sabd-progetto1-2024_25.git
 cd sabd-progetto1-2024_25
-git checkout spark-q3
-docker-compose up --build
+git checkout main
+docker compose up -d
+```
 
 Accedi ai servizi:
 - **Apache NiFi UI:** http://localhost:8080/nifi
 - **HDFS Web UI:** http://localhost:9870
 - **Spark UI (job monitoring):** http://localhost:4040
 - **Grafana UI (visualizzazione):** http://localhost:3000
+
+### 📦 Esecuzione della pipeline
+
+Esegui l'intera pipeline (dalla data ingestion fino all'esportazione dei risultati) tramite lo script `run_full_pipeline.py`:
+> 📂 **Lo script va eseguito dalla cartella principale del progetto (root directory).**
+```bash
+python3 ./scripts/run_full_pipeline.py [q1|q2|q3] [rdd|df|sql]
+```
+- _q1_, _q2_, _q3_ indicano la query da eseguire
+- _rdd_, _df_, _sql_ specificano l'API di Spark da utilizzare
+
+Lo script si occupa automaticamente di:
+
+1. Avviare il flusso di acquisizione e ingestione dati (NiFi)
+2. Eseguire la query
+3. Esportare i risultati su Redis
+4. Salvare i risultati in formato CSV in _Results/csv/_
+5. Creare i grafici
 
 ---
 
