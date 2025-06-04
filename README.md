@@ -50,15 +50,29 @@ L'obiettivo del progetto è elaborare e analizzare dataset sull'intensità di ca
 
 ---
 
-## ⚙️ Setup ed esecuzione (DA FARE)
+## ⚙️ Setup ed esecuzione
 
 ### 🔧 Prerequisiti
 
-- Docker ≥ 20.10  
-- Docker Compose ≥ 1.29  
-- Python ≥ 3.8 (opzionale, per test locali)
+> ⚠️ Il progetto è eseguibile **esclusivamente su sistemi Linux**.  
+> ❌ Non è garantita la compatibilità su Windows.
 
-### 🚀 Avvio ambiente
+Assicurati di avere installato i seguenti componenti:
+
+- **Docker** ≥ 20.10  
+- **Docker Compose** ≥ 1.29  
+- [**Python**](https://www.python.org/) (consigliato: versione 3.8+)
+- [**Google Chrome**](https://www.google.com/chrome/) (necessario per Selenium)
+- **Selenium** versione **4.6+** (richiede Selenium Manager)
+
+Installa le librerie Python necessarie con:
+
+```bash
+pip install requests selenium
+pip install --upgrade requests urllib3 chardet
+```
+
+### 🚀 Avvio ambiente (DA FARE)
 
 ????????????????????```bash
 git clone https://github.com/MatteoBasili/sabd-progetto1-2024_25.git
