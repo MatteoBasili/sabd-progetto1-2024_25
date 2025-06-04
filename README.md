@@ -41,7 +41,7 @@ L'obiettivo del progetto è elaborare e analizzare dataset sull'intensità di ca
 | `Results/analysis/`             | Tempi di processamento sperimentale                                        |
 | `Results/csv/`                  | Output CSV delle query Q1, Q2, Q3                                           |
 | `Results/images/`               | Grafici generati a partire dai risultati delle query                       |
-| `hdfs/`                          | Dati in input/output caricati su HDFS                                      |
+| `hdfs/`                          | Configurazioni e utilities per l'HDFS                                      |
 | `nifi/`                          | Template e utilities per Apache NiFi per la data ingestion                 |
 | `results_exporter/docker/`      | Dockerfile per esportazione dei risultati da HDFS verso Redis              |
 | `scripts/`                       | Script per ingestion, processing (Spark RDD/DataFrame/SQL), export e grafici |
