@@ -26,9 +26,9 @@ The goal of the project is to process and analyze datasets on carbon intensity a
 
 ---
 
-## 🧱 Architectural Diagram (TO DO)
+## 🧱 Architectural Diagram
 
-[Add a .png image with link]
+[![System Architecture](Report/sabd_project1_architectural_diagram.png)](Report/sabd_project1_architectural_diagram.png)
 
 ---
 
