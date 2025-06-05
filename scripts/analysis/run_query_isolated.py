@@ -22,6 +22,15 @@ def do_data_ingestion():
         print(f"❌ Errore nell'esecuzione: {ingestion.stderr}")
         sys.exit(ingestion.returncode)
     return None
+    
+def stop_and_rm_nifi_container():
+    print("Stopping NiFi container...")
+    subprocess.run(["docker", "compose", "stop", "nifi],
+                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(1)
+    print("Removing NiFi container...")
+    subprocess.run(["docker", "compose", "rm", "-f", "nifi"],
+                   cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def run_spark_job(command):
     print("Running Spark job...")
@@ -65,6 +74,7 @@ def main():
         print(f"\n=== RUN {i} ===")
         reset_the_environment()
         do_data_ingestion()
+        stop_and_rm_nifi_container()
         duration = run_spark_job(spark_submit_command)
         durations.append(duration)
         print(f"Run {i} completed in {duration:.2f} seconds")
