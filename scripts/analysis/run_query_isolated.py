@@ -25,7 +25,7 @@ def do_data_ingestion():
     
 def stop_and_rm_nifi_container():
     print("Stopping NiFi container...")
-    subprocess.run(["docker", "compose", "stop", "nifi],
+    subprocess.run(["docker", "compose", "stop", "nifi"],
                    cwd=DOCKER_COMPOSE_PATH, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(1)
     print("Removing NiFi container...")
