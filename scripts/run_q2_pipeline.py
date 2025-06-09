@@ -34,7 +34,7 @@ def main():
         work_dir = "/opt/spark/work-dir/"
 
     print("🚀 Avvio Spark job...")
-    run_command(f"docker exec spark-master spark-submit {work_dir}q2-{mode}.py")
+    run_command(f"docker exec spark-master spark-submit --master spark://spark-master:7077 {work_dir}q2-{mode}.py")
 
     print("📦 Recupero ultimo path di output mensile completo (per grafici)...")
     monthly_all_path = get_last_output_path(f"q2_{mode}_all_")

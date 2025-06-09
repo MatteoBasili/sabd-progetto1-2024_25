@@ -2,6 +2,6 @@
 
 === PERFORMANCE STATISTICS ===
 Number of runs: 10
-Average execution time: 56.33 seconds
-Standard deviation: 0.74 seconds
-All run times: [55.94, 55.79, 55.53, 56.4, 56.65, 55.36, 57.08, 56.01, 57.74, 56.77]
+Average execution time: 71.80 seconds
+Standard deviation: 1.12 seconds
+All run times: [72.04, 72.94, 72.55, 70.01, 71.79, 73.75, 70.66, 71.75, 71.65, 70.81]

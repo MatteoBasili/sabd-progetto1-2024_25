@@ -34,7 +34,7 @@ def main():
         work_dir = "/opt/spark/work-dir/"
 
     print("🚀 Avvio Spark job...")
-    run_command(f"docker exec spark-master spark-submit {work_dir}q3-{mode}.py")
+    run_command(f"docker exec spark-master spark-submit --master spark://spark-master:7077 {work_dir}q3-{mode}.py")
 
     print("📦 Recupero ultimo path di output completo per fasce orarie (per grafici)...")
     hourly_all_path = get_last_output_path(f"q3_{mode}_hourly_")

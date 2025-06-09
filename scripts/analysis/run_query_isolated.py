@@ -66,6 +66,8 @@ def main():
     spark_submit_command = [
         "docker", "exec", "spark-master",
         "spark-submit",
+        "--master",
+        "spark://spark-master:7077",
         f"{work_dir}{query}-{mode}.py"
     ]
 
